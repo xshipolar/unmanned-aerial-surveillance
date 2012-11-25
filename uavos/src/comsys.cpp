@@ -8,9 +8,9 @@
  * Author      : Xichen Shi
  */
 
-#include <comsys.hpp>
-#include <uavos.hpp>
-#include <mavlink/common/mavlink.h>
+#include "../include/comsys.hpp"
+#include "../include/uavos.hpp"
+#include "../include/mavlink/common/mavlink.h"
 #include <pthread.h>
 
 /**

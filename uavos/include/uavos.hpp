@@ -9,7 +9,7 @@
 #define UAVOS_HPP_
 
 #include <cstring>
-#include <mavlink/common/mavlink.h>
+#include "mavlink/common/mavlink.h"
 
 /** Global variables **/
 // Autopilot-state related containers

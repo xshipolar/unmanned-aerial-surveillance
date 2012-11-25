@@ -61,7 +61,7 @@ void mouseHandler(int event, int x, int y, int flags, void *param){
         box.height *= -1;
     }
     gotBB = true;
-	stopVideo=true;
+	stopVideo=false;
     break;
   }
 }
@@ -188,6 +188,8 @@ REPEAT:
       drawBox(frame,pbox);
       detections++;
     }
+    else
+    cout <<"Lost Track \n";
 	time_t t2=time(0);
 	lot++;
 	if(difftime(t2,t1)>1)

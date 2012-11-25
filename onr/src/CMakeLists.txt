@@ -12,4 +12,4 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/../bin)
 add_executable(onr onr.cpp)
 
 # link boost_system and pthread to prevent error
-target_link_libraries(onr boost_system pthread ${OpenCV_LIBS})
+target_link_libraries(onr pthread ${OpenCV_LIBS})
