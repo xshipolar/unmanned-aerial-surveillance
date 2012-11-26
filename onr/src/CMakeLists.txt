@@ -7,7 +7,7 @@ find_package(OpenCV REQUIRED)
 # put executable in bin folder
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/../bin)
 
-# 
+# project include dir
 include_directories( ${PROJECT_SOURCE_DIR}/../include )
 
 # create exectubale for file
