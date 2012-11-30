@@ -9,6 +9,7 @@
 #include <iostream>
 #include <inttypes.h>
 #include <sys/time.h>
+#include <ctime>
 #include <cstdio>
 #include <cstring>
 #include <opencv2/opencv.hpp>
@@ -25,18 +26,28 @@
 using namespace std;
 using namespace cv;
 /////////////////////////////////////////////////////////////////////
+///////////////////////// System Condition //////////////////////////
+/////////////////////////////////////////////////////////////////////
+#define ENABLED              1
+#define DISABLED            -1
+#define DISPLAY             ENABLED
+
+/////////////////////////////////////////////////////////////////////
 /////////////////////////// Data Log ////////////////////////////////
 /////////////////////////////////////////////////////////////////////
 FILE *logIMU;
 FILE *logGPS;
 FILE *logFrame;
+string mainPath = "../test_data/";
 
 /////////////////////////////////////////////////////////////////////
 ///////////////////////// System Status /////////////////////////////
 /////////////////////////////////////////////////////////////////////
 bool alive = true;
+bool active = false;
 uint8_t buf[MAVLINK_MAX_PACKET_LEN];
 static unsigned long startTime = 0;
+static unsigned long lastActiveTime = 0;
 
 /////////////////////////////////////////////////////////////////////
 ////////////////////////// Video Src ////////////////////////////////
@@ -81,14 +92,17 @@ void captureVideo()
 {
     Mat frame;
     videoSrc0>>frame;
+#if DISPLAY == ENABLED
     imshow(window1, frame);
-    
+#endif    
     frameCount++;
-    char imgName[14], imgPath[30];
+    char imgName[14];
     sprintf(imgName, "%010d.jpg", frameCount);
-    sprintf(imgPath, "../test_data/%s",imgName);
-    fprintf(logFrame,"%10d,%010d.jpg\n" ,microSecond(),frameCount);
-    imwrite(imgPath, frame);
+    string imgPath = mainPath + "/img/" + imgName;
+    if (active) {
+        fprintf(logFrame,"%10d,%010d\n" ,microSecond(),frameCount);
+        imwrite(imgPath, frame);
+    }
 }
 
 void handleMessage()
@@ -103,7 +117,7 @@ void handleMessage()
                 mavlink_raw_imu_t raw_imu;
                 mavlink_msg_raw_imu_decode(&msg, &raw_imu);
 	            fprintf(logIMU, "%12d,%10d,%10d,%10d,%10d,%10d,%10d,\n",microSecond(),raw_imu.xacc,raw_imu.yacc,raw_imu.zacc,raw_imu.xgyro,raw_imu.ygyro,raw_imu.zgyro);
-		        printf("%12d,%10d,%10d,%10d,%10d,%10d,%10d,\n",microSecond(),raw_imu.xacc,raw_imu.yacc,raw_imu.zacc,raw_imu.xgyro,raw_imu.ygyro,raw_imu.zgyro);
+		        //printf("%12d,%10d,%10d,%10d,%10d,%10d,%10d,\n",microSecond(),raw_imu.xacc,raw_imu.yacc,raw_imu.zacc,raw_imu.xgyro,raw_imu.ygyro,raw_imu.zgyro);
 		        break;		
 		        
 	        case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
@@ -116,7 +130,9 @@ void handleMessage()
             case MAVLINK_MSG_ID_HEARTBEAT:
                 mavlink_heartbeat_t heartbeat;
                 mavlink_msg_heartbeat_decode(&msg, &heartbeat);
-                //printf("mavlink heartbeat received \n");
+                active = true;
+                lastActiveTime = microSecond();
+                printf("mavlink heartbeat received: system is active \n");
                 break;
             
             default:
@@ -132,6 +148,7 @@ void *runThread1(void*)
     while(alive)
     {
         captureVideo();
+#if DISPLAY == ENABLED
         char c = waitKey(33);
         if (c==27)
         {
@@ -139,6 +156,7 @@ void *runThread1(void*)
             alive=false;
             pthread_mutex_unlock( &mutex1 );
         }
+#endif
     }
 }
 
@@ -148,20 +166,65 @@ void *runThread2(void*)
     while(alive)
     {
         handleMessage();
+        if (microSecond() - lastActiveTime > 1500000) active = false;
     }
 }
-      
+
+string getNumTime(time_t *rawTime)
+{
+    string stringTime = ctime(rawTime);
+    string date, year, month, time;
+    for (int i=0;i<24;i++){
+        switch (i) {
+        case 4:
+        case 5:
+        case 6:
+            month += stringTime[i];
+            break;
+        case 8:
+        case 9:
+            date += stringTime[i];
+            break;
+        case 11:
+        case 12:
+        case 14:
+        case 15:
+            time += stringTime[i];
+            break;
+        case 20:
+        case 21:
+        case 22:
+        case 23:
+            year += stringTime[i];
+            break;
+        default:
+            break;
+        }
+    }
+    string numTime_t = month + date + year + time;
+    return numTime_t;
+}     
+
 int main()
 {   
     // start system timer
     startTime = microSecond();
     
+    // Get current data and time
+    time_t rawTime;
+    time(&rawTime);
+    string numTime;
+    numTime = getNumTime(&rawTime);
+    printf ( "The current local time is: %s \n", ctime(&rawTime) );
+    
     // Serial through termios
     memset(&serialConfig, 0, sizeof(serialConfig));
     setSerialPort(&serialConfig, Serial);
     
-    // Video Capture
+    // Video Display
+#if DISPLAY == ENABLED
     namedWindow(window1,CV_WINDOW_AUTOSIZE);
+#endif
     
     // Check port status
     if (Serial != -1) {
@@ -178,14 +241,26 @@ int main()
         return -1;
     }
 
-    // serial_port reading and writing
-    int count = 0;
-    logIMU = fopen("../test_data/IMUdata", "w");
-    logGPS = fopen("../test_data/GPSdata", "w");
-    logFrame = fopen("../test_data/Framedata","w");
+    // create dir and files
+    mainPath += numTime;
+    cout<<"saving files to "<<mainPath<<endl;
+    string imuPath, gpsPath, framePath, imgPath;
+    imgPath   = mainPath+"/img";
+    imuPath   = mainPath+"/IMUdata";
+    gpsPath   = mainPath+"/GPSdata";
+    framePath = mainPath+"/Framedata";
+    string dir_cmd1 = "mkdir "+ mainPath;
+    string dir_cmd2 = "mkdir "+ imgPath;
+    // creating paths
+    system(dir_cmd1.c_str());
+    system(dir_cmd2.c_str());
+    // openning files
+    logIMU   = fopen(imuPath.c_str(), "w");
+    logGPS   = fopen(gpsPath.c_str(), "w");
+    logFrame = fopen(framePath.c_str(),"w");
     fprintf(logIMU, "     time(us)   xacc(mg)   yacc(mg)   zacc(mg)      xgyro      ygyro      zgyro\n");
     fprintf(logGPS, "     time(us)  lat(deg*e7)  lon(deg*e7)    alt(mm)    agl(mm)   vx(m/s*e2)   vy(m/s*e2)   vz(m/s*e2)  hdg(deg*e2)\n");
-    //printf("     time(us)   xacc(mg)   yacc(mg)   zacc(mg)      xgyro      ygyro      zgyro\n");   
+ 
     // Mainloop
     pthread_t thread1, thread2;
 
