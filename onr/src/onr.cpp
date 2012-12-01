@@ -183,6 +183,7 @@ string getNumTime(time_t *rawTime)
             break;
         case 8:
         case 9:
+            if (stringTime[i] == ' ') stringTime[i] = '0';
             date += stringTime[i];
             break;
         case 11:
