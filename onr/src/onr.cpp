@@ -13,7 +13,6 @@
 #include <cstdio>
 #include <cstring>
 #include <opencv2/opencv.hpp>
-#include <cv.h>
 
 #include <termios.h>
 #include <fcntl.h>
@@ -233,7 +232,7 @@ int main()
     }
     else {
         cout << "Serial port "<< serialName <<" is NOT available" <<endl;
-        return -1;
+        //return -1;
     }
     
     // Check capture device status
