@@ -47,6 +47,7 @@ bool active = false;
 uint8_t buf[MAVLINK_MAX_PACKET_LEN];
 static unsigned long startTime = 0;
 static unsigned long lastActiveTime = 0;
+static unsigned long lastSendTime = 0;
 
 /////////////////////////////////////////////////////////////////////
 ////////////////////////// Video Src ////////////////////////////////
@@ -58,7 +59,7 @@ int frameCount = 0;
 /////////////////////////////////////////////////////////////////////
 //////////////////////// Serial Port ////////////////////////////////
 /////////////////////////////////////////////////////////////////////
-const char *serialName = "/dev/ttyS0";
+const char *serialName = "/dev/ttyACM0";
 termios serialConfig;
 int Serial;
 
@@ -104,6 +105,25 @@ void captureVideo()
     }
 }
 
+void sendMessage(int msgID)
+{
+    mavlink_message_t msg;
+    switch (msgID) {
+    case MAVLINK_MSG_ID_HEARTBEAT:
+        mavlink_msg_heartbeat_pack(255, 0, &msg, 0,MAV_AUTOPILOT_ARDUPILOTMEGA, 0,0,0);
+        mavlink_msg_to_send_buffer(buf, &msg); 
+        write(Serial, &buf, sizeof(buf));
+        break;
+    case MAVLINK_MSG_ID_REQUEST_DATA_STREAM:
+        mavlink_msg_request_data_stream_pack(255,0,&msg, 1, 1, MAV_DATA_STREAM_RAW_SENSORS, 50, 1);
+        mavlink_msg_to_send_buffer(buf, &msg);
+        write(Serial, &buf, sizeof(buf));
+        break;
+    default:
+        break;
+    }
+}
+
 void handleMessage()
 {
     static unsigned char c;
@@ -116,7 +136,7 @@ void handleMessage()
                 mavlink_raw_imu_t raw_imu;
                 mavlink_msg_raw_imu_decode(&msg, &raw_imu);
 	            fprintf(logIMU, "%12d,%10d,%10d,%10d,%10d,%10d,%10d,\n",microSecond(),raw_imu.xacc,raw_imu.yacc,raw_imu.zacc,raw_imu.xgyro,raw_imu.ygyro,raw_imu.zgyro);
-		        //printf("%12d,%10d,%10d,%10d,%10d,%10d,%10d,\n",microSecond(),raw_imu.xacc,raw_imu.yacc,raw_imu.zacc,raw_imu.xgyro,raw_imu.ygyro,raw_imu.zgyro);
+		        printf("%12d,%10d,%10d,%10d,%10d,%10d,%10d,\n",microSecond(),raw_imu.xacc,raw_imu.yacc,raw_imu.zacc,raw_imu.xgyro,raw_imu.ygyro,raw_imu.zgyro);
 		        break;		
 		        
 	        case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
@@ -129,9 +149,14 @@ void handleMessage()
             case MAVLINK_MSG_ID_HEARTBEAT:
                 mavlink_heartbeat_t heartbeat;
                 mavlink_msg_heartbeat_decode(&msg, &heartbeat);
-                active = true;
-                lastActiveTime = microSecond();
-                printf("mavlink heartbeat received: system is active \n");
+                if (heartbeat.system_status == MAV_STATE_ACTIVE){
+                    active = true;
+                    lastActiveTime = microSecond();
+                    printf("APM is active \n");
+                } else if (heartbeat.system_status == MAV_STATE_CALIBRATING) {
+                    printf("APM is initialising \n");
+                    active = false;
+                }
                 break;
             
             default:
@@ -166,6 +191,22 @@ void *runThread2(void*)
     {
         handleMessage();
         if (microSecond() - lastActiveTime > 1500000) active = false;
+    }
+}
+
+void *runThread3(void*)
+{
+    bool setStream = true;
+    while(alive)
+    {
+        if (active && setStream) {
+            sendMessage(MAVLINK_MSG_ID_REQUEST_DATA_STREAM);
+            setStream = false;
+        }
+        if (microSecond() - lastSendTime > 1000000) {
+            sendMessage(MAVLINK_MSG_ID_HEARTBEAT);
+            lastSendTime = microSecond();
+        }
     }
 }
 
@@ -260,14 +301,16 @@ int main()
     logFrame = fopen(framePath.c_str(),"w");
     fprintf(logIMU, "     time(us)   xacc(mg)   yacc(mg)   zacc(mg)      xgyro      ygyro      zgyro\n");
     fprintf(logGPS, "     time(us)  lat(deg*e7)  lon(deg*e7)    alt(mm)    agl(mm)   vx(m/s*e2)   vy(m/s*e2)   vz(m/s*e2)  hdg(deg*e2)\n");
- 
+
     // Mainloop
-    pthread_t thread1, thread2;
+    pthread_t thread1, thread2, thread3;
 
 	pthread_create( &thread1, NULL, runThread1, NULL);
 	pthread_create( &thread2, NULL, runThread2, NULL);
+	pthread_create( &thread3, NULL, runThread3, NULL);
     pthread_join( thread1, NULL );
     pthread_join( thread2, NULL );
+    pthread_join( thread3, NULL );
 
     return 0;
 }
