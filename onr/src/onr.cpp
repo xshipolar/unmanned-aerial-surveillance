@@ -29,7 +29,7 @@ using namespace cv;
 /////////////////////////////////////////////////////////////////////
 #define ENABLED              1
 #define DISABLED            -1
-#define DISPLAY             ENABLED
+#define DISPLAY             DISABLED
 
 /////////////////////////////////////////////////////////////////////
 /////////////////////////// Data Log ////////////////////////////////
@@ -37,6 +37,10 @@ using namespace cv;
 FILE *logIMU;
 FILE *logGPS;
 FILE *logFrame;
+FILE *logSO;
+FILE *logATT;
+FILE *logDRIFT;
+FILE *logALT;
 string mainPath = "../test_data/";
 
 /////////////////////////////////////////////////////////////////////
@@ -115,7 +119,23 @@ void sendMessage(int msgID)
         write(Serial, &buf, sizeof(buf));
         break;
     case MAVLINK_MSG_ID_REQUEST_DATA_STREAM:
-        mavlink_msg_request_data_stream_pack(255,0,&msg, 1, 1, MAV_DATA_STREAM_RAW_SENSORS, 50, 1);
+        mavlink_msg_request_data_stream_pack(255,0,&msg, 1, 1, MAV_DATA_STREAM_RAW_SENSORS, 100, 1);
+        mavlink_msg_to_send_buffer(buf, &msg);
+        write(Serial, &buf, sizeof(buf));
+        
+        mavlink_msg_request_data_stream_pack(255,0,&msg, 1, 1, MAV_DATA_STREAM_POSITION, 5, 1);
+        mavlink_msg_to_send_buffer(buf, &msg);
+        write(Serial, &buf, sizeof(buf));
+        
+        mavlink_msg_request_data_stream_pack(255,0,&msg, 1, 1, MAV_DATA_STREAM_EXTRA1, 5, 1);
+        mavlink_msg_to_send_buffer(buf, &msg);
+        write(Serial, &buf, sizeof(buf));
+        
+        mavlink_msg_request_data_stream_pack(255,0,&msg, 1, 1, MAV_DATA_STREAM_EXTRA2, 20, 1);
+        mavlink_msg_to_send_buffer(buf, &msg);
+        write(Serial, &buf, sizeof(buf));
+        
+        mavlink_msg_request_data_stream_pack(255,0,&msg, 1, 1, MAV_DATA_STREAM_EXTRA3, 20, 1);
         mavlink_msg_to_send_buffer(buf, &msg);
         write(Serial, &buf, sizeof(buf));
         break;
@@ -136,16 +156,40 @@ void handleMessage()
                 mavlink_raw_imu_t raw_imu;
                 mavlink_msg_raw_imu_decode(&msg, &raw_imu);
 	            fprintf(logIMU, "%12d,%10d,%10d,%10d,%10d,%10d,%10d,\n",microSecond(),raw_imu.xacc,raw_imu.yacc,raw_imu.zacc,raw_imu.xgyro,raw_imu.ygyro,raw_imu.zgyro);
-		        printf("%12d,%10d,%10d,%10d,%10d,%10d,%10d,\n",microSecond(),raw_imu.xacc,raw_imu.yacc,raw_imu.zacc,raw_imu.xgyro,raw_imu.ygyro,raw_imu.zgyro);
+		        //printf("%12d,%10d,%10d,%10d,%10d,%10d,%10d,\n",microSecond(),raw_imu.xacc,raw_imu.yacc,raw_imu.zacc,raw_imu.xgyro,raw_imu.ygyro,raw_imu.zgyro);
 		        break;		
 		        
 	        case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
 	            mavlink_global_position_int_t gps;
 	            mavlink_msg_global_position_int_decode(&msg, &gps);
-	            fprintf(logGPS, "%12d,%12d,%12d,%10d,%10d,%12d,%12d,%12d,%12d,\n",microSecond(), gps.lat, gps.lon, gps.lat, gps.relative_alt, gps.vx, gps.vy, gps.vz, gps.hdg);
-	            //printf("%12d,%12d,%12d,%10d,%10d,%12d,%12d,%12d,%12d,\n",microSecond(, gps.lat, gps.lon, gps.lat, gps.relative_alt, gps.vx, gps.vy, gps.vz, gps.hdg);
+	            //fprintf(logGPS, "%12d,%12d,%12d,%10d,%10d,%12d,%12d,%12d,%12d,\n",microSecond(), gps.lat, gps.lon, gps.lat, gps.relative_alt, gps.vx, gps.vy, gps.vz, gps.hdg);
+	            //printf("%12d,%12d,%12d,%10d,%10d,%12d,%12d,%12d,%12d,\n",microSecond(), gps.lat, gps.lon, gps.lat, gps.relative_alt, gps.vx, gps.vy, gps.vz, gps.hdg);
 	            break;
 	           
+	        case MAVLINK_MSG_ID_SENSOR_OFFSETS:
+	            mavlink_sensor_offsets_t sensor_offsets;
+	            mavlink_msg_sensor_offsets_decode(&msg, &sensor_offsets);
+	            fprintf(logSO, "%12d,%12f,%12f,%12f,%12f,%12f,%12f,\n",microSecond(),sensor_offsets.accel_cal_x, sensor_offsets.accel_cal_y, sensor_offsets.accel_cal_z, sensor_offsets.gyro_cal_x, sensor_offsets.gyro_cal_y, sensor_offsets.gyro_cal_z);
+	            break;
+	            
+	        case MAVLINK_MSG_ID_ATTITUDE:
+	            mavlink_attitude_t attitude;
+	            mavlink_msg_attitude_decode(&msg, &attitude);
+	            fprintf(logATT, "%12d,%12f,%12f,%12f,%12f,%12f,%12f,\n",microSecond(),attitude.roll, attitude.pitch, attitude.yaw, attitude.rollspeed, attitude.pitchspeed, attitude.yawspeed);
+	            break;
+	        
+	        case MAVLINK_MSG_ID_AHRS:
+	            mavlink_ahrs_t ahrs;
+	            mavlink_msg_ahrs_decode(&msg, &ahrs);
+	            fprintf(logDRIFT, "%12d,%12f,%12f,%12f,\n",microSecond(), ahrs.omegaIx, ahrs.omegaIy, ahrs.omegaIz);
+	            break;
+	            
+	        case MAVLINK_MSG_ID_VFR_HUD:
+	            mavlink_vfr_hud_t vfr;
+	            mavlink_msg_vfr_hud_decode(&msg, &vfr);
+	            fprintf(logALT, "%12d,%12f,\n",microSecond(), vfr.alt);
+	            break;
+	            
             case MAVLINK_MSG_ID_HEARTBEAT:
                 mavlink_heartbeat_t heartbeat;
                 mavlink_msg_heartbeat_decode(&msg, &heartbeat);
@@ -285,11 +329,15 @@ int main()
     // create dir and files
     mainPath += numTime;
     cout<<"saving files to "<<mainPath<<endl;
-    string imuPath, gpsPath, framePath, imgPath;
+    string imuPath, gpsPath, framePath, imgPath, offsetPath, attPath, driftPath, altPath;
     imgPath   = mainPath+"/img";
-    imuPath   = mainPath+"/IMUdata";
-    gpsPath   = mainPath+"/GPSdata";
-    framePath = mainPath+"/Framedata";
+    imuPath   = mainPath+"/imu";
+    gpsPath   = mainPath+"/location";
+    offsetPath= mainPath+"/sensor_offsets";
+    attPath   = mainPath+"/attitude";
+    driftPath = mainPath+"/drift";
+    altPath   = mainPath+"/alt";
+    framePath = mainPath+"/framedata";
     string dir_cmd1 = "mkdir "+ mainPath;
     string dir_cmd2 = "mkdir "+ imgPath;
     // creating paths
@@ -299,8 +347,16 @@ int main()
     logIMU   = fopen(imuPath.c_str(), "w");
     logGPS   = fopen(gpsPath.c_str(), "w");
     logFrame = fopen(framePath.c_str(),"w");
-    fprintf(logIMU, "     time(us)   xacc(mg)   yacc(mg)   zacc(mg)      xgyro      ygyro      zgyro\n");
-    fprintf(logGPS, "     time(us)  lat(deg*e7)  lon(deg*e7)    alt(mm)    agl(mm)   vx(m/s*e2)   vy(m/s*e2)   vz(m/s*e2)  hdg(deg*e2)\n");
+    logSO    = fopen(offsetPath.c_str(),"w");
+    logATT   = fopen(attPath.c_str(),"w");
+    logDRIFT = fopen(driftPath.c_str(),"w");
+    logALT   = fopen(altPath.c_str(),"w");
+    fprintf(logIMU,  "     time(us)   xacc(mg)   yacc(mg)   zacc(mg)      xgyro      ygyro      zgyro\n");
+    fprintf(logGPS,  "     time(us)  lat(deg*e7)  lon(deg*e7)    alt(mm)    agl(mm)   vx(m/s*e2)   vy(m/s*e2)   vz(m/s*e2)  hdg(deg*e2)\n");
+    fprintf(logSO,   "     time(us)     cal_xacc     cal_yacc     cal_zacc    cal_xgyro    cal_ygyro    cal_zgyro\n");
+    fprintf(logATT,  "     time(us)    roll(rad)   pitch(rad)     yaw(rad)      rollspd     pitchspd       yawspd (rad/s)\n");
+    fprintf(logDRIFT,"     time(us) x_drift(r/s) y_drift(r/s) z_drift(r/s)\n");
+    fprintf(logALT,  "     time(us)  altitude(m)\n");
 
     // Mainloop
     pthread_t thread1, thread2, thread3;
