@@ -29,7 +29,7 @@ using namespace cv;
 /////////////////////////////////////////////////////////////////////
 #define ENABLED              1
 #define DISABLED            -1
-#define DISPLAY             DISABLED
+#define DISPLAY             ENABLED
 
 /////////////////////////////////////////////////////////////////////
 /////////////////////////// Data Log ////////////////////////////////
@@ -123,7 +123,11 @@ void sendMessage(int msgID)
         mavlink_msg_to_send_buffer(buf, &msg);
         write(Serial, &buf, sizeof(buf));
         
-        mavlink_msg_request_data_stream_pack(255,0,&msg, 1, 1, MAV_DATA_STREAM_POSITION, 5, 1);
+        //mavlink_msg_request_data_stream_pack(255,0,&msg, 1, 1, MAV_DATA_STREAM_POSITION, 5, 1);
+        //mavlink_msg_to_send_buffer(buf, &msg);
+        //write(Serial, &buf, sizeof(buf));
+        
+        mavlink_msg_request_data_stream_pack(255,0,&msg, 1, 1, MAV_DATA_STREAM_EXTENDED_STATUS, 5, 1);
         mavlink_msg_to_send_buffer(buf, &msg);
         write(Serial, &buf, sizeof(buf));
         
@@ -159,11 +163,13 @@ void handleMessage()
 		        //printf("%12d,%10d,%10d,%10d,%10d,%10d,%10d,\n",microSecond(),raw_imu.xacc,raw_imu.yacc,raw_imu.zacc,raw_imu.xgyro,raw_imu.ygyro,raw_imu.zgyro);
 		        break;		
 		        
-	        case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
-	            mavlink_global_position_int_t gps;
-	            mavlink_msg_global_position_int_decode(&msg, &gps);
-	            //fprintf(logGPS, "%12d,%12d,%12d,%10d,%10d,%12d,%12d,%12d,%12d,\n",microSecond(), gps.lat, gps.lon, gps.lat, gps.relative_alt, gps.vx, gps.vy, gps.vz, gps.hdg);
-	            //printf("%12d,%12d,%12d,%10d,%10d,%12d,%12d,%12d,%12d,\n",microSecond(), gps.lat, gps.lon, gps.lat, gps.relative_alt, gps.vx, gps.vy, gps.vz, gps.hdg);
+	        case MAVLINK_MSG_ID_GPS_RAW_INT:
+	            mavlink_gps_raw_int_t gps;
+	            mavlink_msg_gps_raw_int_decode(&msg, &gps);
+	            fprintf(logGPS, "%12d,%12d,%12d,%12d,%12d,%12d,%12d,%12d,%12d,%12d,\n",microSecond(), gps.lat, gps.lon, gps.alt, 
+	                    gps.eph, gps.epv, gps.vel, gps.cog, gps.fix_type, gps.satellites_visible);
+	            //printf("%12d,%12d,%12d,%12d,%12d,%12d,%12d,%12d,%12d,%12d,\n",microSecond(), gps.lat, gps.lon, gps.alt, 
+	            //        gps.eph, gps.epv, gps.vel, gps.cog, gps.fix_type, gps.satellites_visible);
 	            break;
 	           
 	        case MAVLINK_MSG_ID_SENSOR_OFFSETS:
@@ -321,6 +327,8 @@ int main()
     }
     
     // Check capture device status
+    videoSrc0.set(CV_CAP_PROP_FRAME_WIDTH, 640);
+    videoSrc0.set(CV_CAP_PROP_FRAME_HEIGHT, 480);
     if (!videoSrc0.isOpened()) {
 	    cout << "capture device failed to open!" << endl;
         return -1;
@@ -352,7 +360,7 @@ int main()
     logDRIFT = fopen(driftPath.c_str(),"w");
     logALT   = fopen(altPath.c_str(),"w");
     fprintf(logIMU,  "     time(us)   xacc(mg)   yacc(mg)   zacc(mg)      xgyro      ygyro      zgyro\n");
-    fprintf(logGPS,  "     time(us)  lat(deg*e7)  lon(deg*e7)    alt(mm)    agl(mm)   vx(m/s*e2)   vy(m/s*e2)   vz(m/s*e2)  hdg(deg*e2)\n");
+    fprintf(logGPS,  "     time(us)  lat(deg*e7)  lon(deg*e7)      alt(mm)      eph(cm)      epv(cm)      vel(cm/s)  cog(deg*e2)    fix_type    satellites_visible\n");
     fprintf(logSO,   "     time(us)     cal_xacc     cal_yacc     cal_zacc    cal_xgyro    cal_ygyro    cal_zgyro\n");
     fprintf(logATT,  "     time(us)    roll(rad)   pitch(rad)     yaw(rad)      rollspd     pitchspd       yawspd (rad/s)\n");
     fprintf(logDRIFT,"     time(us) x_drift(r/s) y_drift(r/s) z_drift(r/s)\n");
