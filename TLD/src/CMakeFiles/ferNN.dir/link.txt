@@ -1,0 +1,2 @@
+/usr/bin/ar cr /home/labuser/uastracking/TLD_tracking_images/lib/libferNN.a  CMakeFiles/ferNN.dir/FerNNClassifier.o
+/usr/bin/ranlib /home/labuser/uastracking/TLD_tracking_images/lib/libferNN.a

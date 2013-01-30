@@ -1,0 +1,2 @@
+/usr/bin/ar cr /home/labuser/uastracking/TLD_tracking_images/lib/libLKTracker.a  CMakeFiles/LKTracker.dir/LKTracker.o
+/usr/bin/ranlib /home/labuser/uastracking/TLD_tracking_images/lib/libLKTracker.a
