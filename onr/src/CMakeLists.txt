@@ -12,6 +12,10 @@ include_directories( ${PROJECT_SOURCE_DIR}/../include )
 
 # create exectubale for file
 add_executable(onr onr.cpp)
+add_executable(sift_test sift_test.cpp)
+add_executable(surf_test surf_test.cpp)
 
 # link boost_system and pthread to prevent error
 target_link_libraries(onr pthread ${OpenCV_LIBS})
+target_link_libraries(sift_test ${OpenCV_LIBS})
+target_link_libraries(surf_test ${OpenCV_LIBS})

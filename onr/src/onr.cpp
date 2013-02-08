@@ -1,5 +1,4 @@
-/*
- * Video Sync code for onr research
+/* Video Sync code for onr research
  *
  * Created on : 07-01-2012
  *     Author : Xichen Shi
@@ -29,7 +28,7 @@ using namespace cv;
 /////////////////////////////////////////////////////////////////////
 #define ENABLED              1
 #define DISABLED            -1
-#define DISPLAY             ENABLED
+#define DISPLAY             DISABLED
 
 /////////////////////////////////////////////////////////////////////
 /////////////////////////// Data Log ////////////////////////////////

@@ -1,0 +1,9 @@
+#!/bin/bash
+#######
+
+#starts the ad hoc server
+ifconfig ath0 down
+iwconfig ath0 mode ad-hoc
+iwconfig ath0 channel 4
+iwconfig ath0 essid 'mine'
+ifconfig ath0 10.0.0.1 up
