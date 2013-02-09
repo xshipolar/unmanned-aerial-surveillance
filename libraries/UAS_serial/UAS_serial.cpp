@@ -9,11 +9,17 @@
 #include "UAS_serial.hpp"
 
 /**
- * @brief constructor for the UAS_serial class
- * @param serial_name -- name for the uart/rs232/usb device
+ * @brief constructor of UAS_serial class
+ */
+UAS_serial::UAS_serial(const char* serial_name){
+    _device_name = serial_name;
+}
+
+/**
+ * @brief initializer for port
  * @param baud_rate -- bits-per-sec for the I/O
  */
-UAS_serial::UAS_serial(const char* serial_name, uint32_t baudrate){
+int UAS_serial::beginPort(uint32_t baudrate){
     int baudr;
     _baudrate = baudrate;
     
@@ -69,7 +75,7 @@ UAS_serial::UAS_serial(const char* serial_name, uint32_t baudrate){
                      break;
     } 
 
-    _serial_id = open(serial_name, O_RDWR | O_NOCTTY | O_NONBLOCK);
+    _serial_id = open(_device_name, O_RDWR | O_NOCTTY | O_NONBLOCK);
     if(_serial_id == -1){
       perror("unable to open comport ");
       _error = -1;
@@ -113,7 +119,7 @@ int UAS_serial::fetch(unsigned char* c){
  */
 int UAS_serial::send(uint8_t* buf){
     int len;
-    len = write(Serial, buf, sizeof(buf));
+    len = write(_serial_id, buf, sizeof(buf));
     return len;
 }
 
