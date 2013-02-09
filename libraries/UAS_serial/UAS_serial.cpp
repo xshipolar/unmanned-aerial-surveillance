@@ -98,6 +98,7 @@ UAS_serial::UAS_serial(const char* serial_name, uint32_t baudrate){
 /**
  * @brief fetch the next coming byte
  * @param c -- the char to be read into
+ * @return length of the packet (bytes)
  */
 int UAS_serial::fetch(unsigned char* c){
     int len;
@@ -108,6 +109,7 @@ int UAS_serial::fetch(unsigned char* c){
 /**
  * @brief send out a buffer of bytes
  * @param buf --array to be sent 
+ * @return length of the packet (bytes)
  */
 int UAS_serial::send(uint8_t* buf){
     int len;

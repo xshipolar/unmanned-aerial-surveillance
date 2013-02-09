@@ -10,7 +10,7 @@
 #define UAS_serial
 
 #include <termios.h>
-#include <stdio>
+#include <cstdio>
 #include <inttypes.h>
 #include <fcntl.h>
 
