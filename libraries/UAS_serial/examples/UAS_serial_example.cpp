@@ -10,15 +10,17 @@ using namespace std;
 UAS_serial Serial1("/dev/ttyACM0");
 
 int main(){
-	Serial1.beginPort(115200);
-	static unsigned char readByte;
-	static uint8_t sendByte = 40;
-	for (int i = 0; i < 100; ++i)
-	{
-		Serial1.send(&sendByte);
-		Serial1.fetch(&readByte);
-		cout<<readByte<<endl;
-	}
-	Serial1.closePort();
-	return 0;
+    Serial1.beginPort(115200);
+    static unsigned char readByte;
+    static uint8_t sendByte = 40;
+    for (;;)
+    {
+        Serial1.send(&sendByte);
+        if (Serial1.fetch(&readByte)>0)
+        {
+            cout<<readByte<<endl;
+        }   
+    }
+    Serial1.closePort();
+    return 0;
 }

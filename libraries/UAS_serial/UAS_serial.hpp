@@ -19,12 +19,36 @@
 class UAS_serial {
 public:
 	UAS_serial(const char* serial_name);
-    int beginPort(uint32_t baudrate);
-    int fetch(unsigned char* c);
-    int send(uint8_t* buf);
+    bool beginPort(uint32_t baudrate);
+/**
+ * @brief fetch the next coming byte
+ * @param c -- the char to be read into
+ * @return length of the packet (bytes)
+ */
+    template <class serial_buffer>
+    int fetch(serial_buffer* rx_buffer){
+        int len;
+        len = read(_serial_id, rx_buffer, sizeof(rx_buffer));
+        return len;
+    }
+
+/**
+ * @brief send out a buffer of bytes
+ * @param buf --array to be sent 
+ * @return length of the packet (bytes)
+ */
+    template <class serial_buffer>
+    int send(serial_buffer* tx_buffer){
+        int len;
+        len = write(_serial_id, tx_buffer, sizeof(tx_buffer));
+        return len;
+    }
+
     void closePort();
     
 private:
+    bool mapBaudRate(uint32_t baudrate, int* baudrate_termios);
+
 	const char* _device_name;
     uint8_t     _serial_id;
     uint32_t    _baudrate;
