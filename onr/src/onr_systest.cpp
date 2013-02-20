@@ -18,8 +18,10 @@
 #include <unistd.h>
 #include <pthread.h>
 
+#include "comsys.hpp"
 #include <mavlink/mavlink_types.h>
 #include <mavlink/ardupilotmega/mavlink.h>
+#include "UAS_serial.hpp"
 
 using namespace std;
 using namespace cv;
@@ -28,7 +30,7 @@ using namespace cv;
 /////////////////////////////////////////////////////////////////////
 #define ENABLED              1
 #define DISABLED            -1
-#define DISPLAY             DISABLED
+#define DISPLAY             ENABLED
 
 /////////////////////////////////////////////////////////////////////
 /////////////////////////// Data Log ////////////////////////////////
@@ -62,26 +64,18 @@ int frameCount = 0;
 /////////////////////////////////////////////////////////////////////
 //////////////////////// Serial Port ////////////////////////////////
 /////////////////////////////////////////////////////////////////////
-const char *serialName = "/dev/ttyACM0";
-termios serialConfig;
-int Serial;
+UAS_serial Serial1("/dev/ttyACM0");
 
 /////////////////////////////////////////////////////////////////////
 ////////////////////////// Functions ////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-void setSerialPort(termios *serialIO, int& tid)
+///////////////////////////////////////////////////////////////////// 
+
+static inline void comm_send_ch(mavlink_channel_t chan, uint8_t ch)
 {
-    serialIO->c_iflag = 0;
-    serialIO->c_oflag = 0;
-    serialIO->c_cflag = CS8|CREAD|CLOCAL;
-    serialIO->c_lflag = 0;
-    serialIO->c_cc[VMIN] = 0;
-    serialIO->c_cc[VTIME]= 0;
-    
-    tid = open(serialName, O_RDWR | O_NONBLOCK);
-    cfsetospeed(serialIO, B115200);
-    cfsetispeed(serialIO, B115200);
-    tcsetattr(tid, TCSANOW, serialIO);
+    if (chan == MAVLINK_COMM_0)
+    {
+        Serial1.send(&ch,1);
+    }
 }
 
 unsigned long microSecond()
@@ -113,44 +107,45 @@ void sendMessage(int msgID)
     mavlink_message_t msg;
     switch (msgID) {
     case MAVLINK_MSG_ID_HEARTBEAT:
-        mavlink_msg_heartbeat_pack(255, 0, &msg, 0,MAV_AUTOPILOT_ARDUPILOTMEGA, 0,0,0);
-        mavlink_msg_to_send_buffer(buf, &msg); 
-        if(write(Serial, &buf, sizeof(buf))==sizeof(buf)){
-            printf("HeartBeat sent.\n");
-        }
+        // mavlink_msg_heartbeat_pack(255, 0, &msg, 0,MAV_AUTOPILOT_ARDUPILOTMEGA, 0,0,0);
+        // mavlink_msg_to_send_buffer(buf, &msg); 
+        // if (Serial1.send(&buf,sizeof(buf))==sizeof(buf)){
+        //     printf("HeartBeat sent.\n");
+        // }
+        mavlink_msg_heartbeat_send(MAVLINK_COMM_0, 0, MAV_AUTOPILOT_ARDUPILOTMEGA, 0,0,0);
         break;
     case MAVLINK_MSG_ID_REQUEST_DATA_STREAM:
         mavlink_msg_request_data_stream_pack(255,0,&msg, 1, 1, MAV_DATA_STREAM_RAW_SENSORS, 100, 1);
         mavlink_msg_to_send_buffer(buf, &msg);
-        if(write(Serial, &buf, sizeof(buf))==sizeof(buf)){
+        if(Serial1.send(&buf,sizeof(buf))==sizeof(buf)){
             printf("RawSensors stream request sent.\n");
         }
         
         //mavlink_msg_request_data_stream_pack(255,0,&msg, 1, 1, MAV_DATA_STREAM_POSITION, 5, 1);
         //mavlink_msg_to_send_buffer(buf, &msg);
-        //write(Serial, &buf, sizeof(buf))>0)
+        //Serial1.send(buf);
         
         mavlink_msg_request_data_stream_pack(255,0,&msg, 1, 1, MAV_DATA_STREAM_EXTENDED_STATUS, 5, 1);
         mavlink_msg_to_send_buffer(buf, &msg);
-        if(write(Serial, &buf, sizeof(buf))==sizeof(buf)){
+        if(Serial1.send(&buf,sizeof(buf))==sizeof(buf)){
             printf("ExtendedStatus stream request sent.\n");
         }
         
         mavlink_msg_request_data_stream_pack(255,0,&msg, 1, 1, MAV_DATA_STREAM_EXTRA1, 5, 1);
         mavlink_msg_to_send_buffer(buf, &msg);
-        if(write(Serial, &buf, sizeof(buf))==sizeof(buf)){
+        if(Serial1.send(&buf,sizeof(buf))==sizeof(buf)){
             printf("Extra1 stream request sent.\n");
         }
         
         mavlink_msg_request_data_stream_pack(255,0,&msg, 1, 1, MAV_DATA_STREAM_EXTRA2, 20, 1);
         mavlink_msg_to_send_buffer(buf, &msg);
-        if(write(Serial, &buf, sizeof(buf))==sizeof(buf)){
+        if(Serial1.send(&buf,sizeof(buf))==sizeof(buf)){
             printf("Extra2 stream request sent.\n");
         }
         
         mavlink_msg_request_data_stream_pack(255,0,&msg, 1, 1, MAV_DATA_STREAM_EXTRA3, 20, 1);
         mavlink_msg_to_send_buffer(buf, &msg);
-        if(write(Serial, &buf, sizeof(buf))==sizeof(buf)){
+        if(Serial1.send(&buf,sizeof(buf))==sizeof(buf)){
             printf("Extra3 stream request sent.\n");
         }
         break;
@@ -164,7 +159,7 @@ void handleMessage()
     static unsigned char c;
     mavlink_message_t msg;
     mavlink_status_t status;
-    if(read(Serial, &c, 1)>0) {
+    if(Serial1.fetch(&c)>0) {
         if (mavlink_parse_char(0, c, &msg, &status)){
             switch (msg.msgid) {
             case MAVLINK_MSG_ID_RAW_IMU:
@@ -309,6 +304,7 @@ string getNumTime(time_t *rawTime)
 
 int main()
 {   
+    mavlink_system.sysid = 255; 
     // start system timer
     startTime = microSecond();
     
@@ -320,22 +316,12 @@ int main()
     printf ( "The current local time is: %s \n", ctime(&rawTime) );
     
     // Serial through termios
-    memset(&serialConfig, 0, sizeof(serialConfig));
-    setSerialPort(&serialConfig, Serial);
+    Serial1.beginPort(115200);
     
     // Video Display
 #if DISPLAY == ENABLED
     namedWindow(window1,CV_WINDOW_AUTOSIZE);
 #endif
-    
-    // Check port status
-    if (Serial != -1) {
-        cout << "Serial port "<< serialName <<" is openned now" <<endl;
-    }
-    else {
-        cout << "Serial port "<< serialName <<" is NOT available" <<endl;
-        //return -1;
-    }
     
     // Check capture device status
     videoSrc0.set(CV_CAP_PROP_FRAME_WIDTH, 960);
