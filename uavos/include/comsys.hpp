@@ -14,26 +14,21 @@
 #include <cstdio>
 #include <mavlink/ardupilotmega/mavlink.h>
 
+#include <UAS_serial/UAS_serial.hpp>
+
 using namespace std;
 
-class COM_SYS
+class UAS_comm
 {
 public:
-    void COM_SYS(int Serial);
-    
-    /* variables */
-    
-    /* methods */
-    bool init();
-    void handleMessage();
-    void sendMessage();
-    void sendStream();
-    
-    void streamTrigger();
+    UAS_comm();
+    ~UAS_comm();
+
+    void parse_APM_msg();
+    void parse_GCS_msg();
 
 private:
-    /* variables */
-    int _serialport;
+
 };
 
 #endif /* COMSYS_HPP_ */

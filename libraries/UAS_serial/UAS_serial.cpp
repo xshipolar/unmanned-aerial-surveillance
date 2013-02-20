@@ -34,7 +34,7 @@ bool UAS_serial::beginPort(uint32_t baudrate){
 
     memset(&_port_settings, 0, sizeof(_port_settings));  // setting memory for port
     _port_settings.c_cflag = baudr | CS8 | CLOCAL | CREAD;
-    _port_settings.c_ifl ag = 0;
+    _port_settings.c_iflag = 0;
     _port_settings.c_oflag = 0;
     _port_settings.c_lflag = 0;
     _port_settings.c_cc[VMIN] = 0;      /* block untill n bytes are received */
