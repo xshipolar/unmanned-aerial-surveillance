@@ -53,8 +53,7 @@ bool UAS_serial::beginPort(uint32_t baudrate){
 /**
  * @brief close the serial port
  */
-void UAS_serial::closePort()
-{
+void UAS_serial::closePort(){
   close(_serial_id);
 }
 

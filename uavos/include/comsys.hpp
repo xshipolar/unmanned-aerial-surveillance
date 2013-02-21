@@ -8,27 +8,16 @@
 #ifndef COMSYS_HPP_
 #define COMSYS_HPP_
 
-#include <iostream>
-#include <inttypes.h>
-#include <ctime>
-#include <cstdio>
-#include <mavlink/ardupilotmega/mavlink.h>
+#include <UAS_comm.hpp>
 
-#include <UAS_serial/UAS_serial.hpp>
+extern UAS_serial Serial_apm;
+extern UAS_serial Serial_gcs;
+extern UAS_comm comModule;
 
-using namespace std;
+void *run_apm_link(void*);
 
-class UAS_comm
-{
-public:
-    UAS_comm();
-    ~UAS_comm();
+void *run_gcs_link(void*);
 
-    void parse_APM_msg();
-    void parse_GCS_msg();
-
-private:
-
-};
+void comsys();
 
 #endif /* COMSYS_HPP_ */

@@ -13,7 +13,7 @@ include_directories( ${PROJECT_SOURCE_DIR}/../include )
 
 # create exectubale for file
 add_library(comsys comsys.cpp)
-add_executable(uavos uavos.cpp)
+add_executable(mainsys mainsys.cpp)
 
 # link boost_system and pthread to prevent error
-target_link_libraries(uavos comsys pthread ${OpenCV_LIBS})
+target_link_libraries(mainsys comsys pthread ${OpenCV_LIBS})
