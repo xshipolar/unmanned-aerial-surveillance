@@ -11,6 +11,8 @@
 #include <sys/time.h>
 #include <ctime>
 
-unsigned long microSecond();
+extern unsigned long program_start_time;
+
+unsigned long getMicroSecond();
 
 #endif /* UTILITY_HPP_ */

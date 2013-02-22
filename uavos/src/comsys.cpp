@@ -10,31 +10,42 @@
 
 #include <comsys.hpp>
 
+UAS_serial Serial_apm("/dev/ttyACM0");
+UAS_serial Serial_gcs("/dev/ttyS0");
+UAS_comm comModule(&Serial_apm, &Serial_gcs);
+
+/**
+ * @brief -- initialize communication system
+ */
+void initComsys() {
+    comModule.init(); // initialize communication subsystem
+}
+
 /**
  * @brief --
  */
-void *run_apm_link(void*){
+void *runApmLink(void*){
     while(true){
-        comModule.update_apm_rx();
+        comModule.updateApm();
     }
 }
 
 /**
  * @brief --
  */
-void *run_gcs_link(void*){
+void *runGcsLink(void*){
     while(true){
-        comModule.update_gcs_rx();
+        comModule.updateGcs();
     }
 }
 
 /**
  * @brief --
  */
-void comsys(){
+void* runComsys(void*){
     pthread_t thread1, thread2;
-    pthread_create( &thread1, NULL, run_apm_link, NULL);
-    pthread_create( &thread2, NULL, run_gcs_link, NULL);
+    pthread_create( &thread1, NULL, runApmLink, NULL);
+    pthread_create( &thread2, NULL, runGcsLink, NULL);
     pthread_join( thread1, NULL );
-    pthread_join( thread2, NULL );
+    pthread_join( thread2, NULL ); 
 }

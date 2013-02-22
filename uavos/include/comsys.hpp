@@ -10,14 +10,12 @@
 
 #include <UAS_comm.hpp>
 
-extern UAS_serial Serial_apm;
-extern UAS_serial Serial_gcs;
-extern UAS_comm comModule;
+void initComsys();
 
-void *run_apm_link(void*);
+void *runApmLink(void*);
 
-void *run_gcs_link(void*);
+void *runGcsLink(void*);
 
-void comsys();
+void *runComsys(void*);
 
 #endif /* COMSYS_HPP_ */

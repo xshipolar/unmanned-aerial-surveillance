@@ -8,10 +8,12 @@
 #ifndef MAINSYS_HPP_
 #define MAINSYS_HPP_
 
+#include <UAS_serial/UAS_serial.hpp>
+#include <UAS_comm.hpp>
+#include <utility.hpp>
+#include <sensor.hpp>
 #include <comsys.hpp>
 
 void initialize();
-
-void *runCommModule(void*);
 
 #endif /* MAINSYS_HPP_ */

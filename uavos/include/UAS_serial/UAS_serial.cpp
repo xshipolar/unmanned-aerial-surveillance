@@ -58,6 +58,14 @@ void UAS_serial::closePort(){
 }
 
 /**
+ * @brief get the name of the port
+ * @return -- string of the name of the port
+ */
+const char* UAS_serial::getDeviceName() {
+  return _device_name;
+}
+
+/**
  * @brief map 32bit baudrate setting to termios baudrate setting
  * @param baudrate -- raw 32 bit number for baudrate
  * @param baudrate_termios -- termios specific number for baudrate

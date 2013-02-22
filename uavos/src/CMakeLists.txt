@@ -12,8 +12,13 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/../lib)
 include_directories( ${PROJECT_SOURCE_DIR}/../include )
 
 # create exectubale for file
+
+add_library(UAS_serial ../include/UAS_serial/UAS_serial.cpp)
+add_library(UAS_comm UAS_comm.cpp)
+add_library(utility utility.cpp)
+add_library(sensor sensor.cpp)
 add_library(comsys comsys.cpp)
 add_executable(mainsys mainsys.cpp)
 
-# link boost_system and pthread to prevent error
-target_link_libraries(mainsys comsys pthread ${OpenCV_LIBS})
+# link 
+target_link_libraries(mainsys comsys UAS_comm UAS_serial sensor utility pthread ${OpenCV_LIBS})

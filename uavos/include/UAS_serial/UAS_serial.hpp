@@ -45,6 +45,9 @@ public:
     }
 
     void closePort();
+
+    // Get info functions
+    const char* getDeviceName();
     
 private:
     bool mapBaudRate(uint32_t baudrate, int* baudrate_termios);
