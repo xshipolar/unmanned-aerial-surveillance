@@ -18,6 +18,6 @@ int main() {
 }
 
 void initialize() {
-    program_start_time = getMicroSecond();
+    program_start_time = getMicroSecond(); // get the reference time in u_sec for system
     initComsys();
 }

@@ -22,11 +22,23 @@ UAS_comm::UAS_comm(UAS_serial* serial_apm, UAS_serial* serial_gcs) {
  */
 void UAS_comm::init(){
      // open ports with baudrate specified
-    _apm_initialised = !_comm_apm->beginPort(115200);
-    _gcs_initialised = !_comm_gcs->beginPort(57600); 
+    _apm_initialised = _comm_apm->beginPort(115200);
+    _gcs_initialised = _comm_gcs->beginPort(57600); 
 
-    if (_apm_initialised) printf("Comm to APM is initialised at %s\n",_comm_apm->getDeviceName() );
-    if (_gcs_initialised) printf("Comm to GCS is initialised at %s\n",_comm_gcs->getDeviceName() );
+    printf("_apm_initialised = %d\n",_apm_initialised);
+    printf("_gcs_initialised = %d\n",_gcs_initialised);
+   
+    // if (_apm_initialised) {
+    //     printf("Port to APM is initialised at %s\n",_comm_apm->getDeviceName() );
+    // } else {
+    //     printf("Port to APM failed to initialised");
+    // }
+    // if (_gcs_initialised) {
+    //     printf("Port to GCS is initialised at %s\n",_comm_gcs->getDeviceName() );
+    // } else {
+    //     printf("Port to GCS failed to initialised");
+    // }
+
 
     // assign mavlink_channels to each link
     _chan_apm = MAVLINK_COMM_0; 

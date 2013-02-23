@@ -57,7 +57,7 @@ static unsigned long lastSendTime = 0;
 /////////////////////////////////////////////////////////////////////
 ////////////////////////// Video Src ////////////////////////////////
 /////////////////////////////////////////////////////////////////////
-VideoCapture videoSrc0(0);
+VideoCapture videoSrc0(1);
 const char *window1 = "Video";
 int frameCount = 0;
    
@@ -324,8 +324,8 @@ int main()
 #endif
     
     // Check capture device status
-    videoSrc0.set(CV_CAP_PROP_FRAME_WIDTH, 960);
-    videoSrc0.set(CV_CAP_PROP_FRAME_HEIGHT, 720);
+    videoSrc0.set(CV_CAP_PROP_FRAME_WIDTH, 1024);
+    videoSrc0.set(CV_CAP_PROP_FRAME_HEIGHT, 768);
     if (!videoSrc0.isOpened()) {
         cout << "capture device failed to open!" << endl;
         return -1;

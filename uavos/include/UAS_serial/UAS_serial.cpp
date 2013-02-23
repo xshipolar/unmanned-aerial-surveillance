@@ -18,6 +18,7 @@ UAS_serial::UAS_serial(const char* serial_name){
 /**
  * @brief initializer for port
  * @param baud_rate -- bits-per-sec for the I/O
+ * @return -- 1 for success 0 for failure
  */
 bool UAS_serial::beginPort(uint32_t baudrate){
     int baudr;
@@ -29,7 +30,7 @@ bool UAS_serial::beginPort(uint32_t baudrate){
     if(_serial_id == -1){
       perror("unable to open comport ");
       _error = -1;
-      return 1;
+      return 0;
     }
 
     memset(&_port_settings, 0, sizeof(_port_settings));  // setting memory for port
@@ -44,10 +45,10 @@ bool UAS_serial::beginPort(uint32_t baudrate){
     if(_error==-1){
       close(_serial_id);
       perror("unable to adjust portsettings ");
-      return 1;
+      return 0;
     }
     
-    return 0;
+    return 1;
 }
 
 /**

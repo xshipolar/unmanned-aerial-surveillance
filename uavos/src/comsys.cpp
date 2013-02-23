@@ -26,7 +26,9 @@ void initComsys() {
  */
 void *runApmLink(void*){
     while(true){
-        comModule.updateApm();
+        if (comModule.isApmOpen()) {
+            comModule.updateApm();
+        }
     }
 }
 
@@ -35,7 +37,9 @@ void *runApmLink(void*){
  */
 void *runGcsLink(void*){
     while(true){
-        comModule.updateGcs();
+        if (comModule.isGcsOpen()) {
+            comModule.updateGcs();
+        }
     }
 }
 

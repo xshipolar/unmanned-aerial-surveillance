@@ -53,9 +53,9 @@ private:
     bool mapBaudRate(uint32_t baudrate, int* baudrate_termios);
 
     const char* _device_name;
-    uint8_t     _serial_id;
+    int8_t      _serial_id;
     uint32_t    _baudrate;
-    uint8_t     _error;
+    int8_t     _error;
     termios     _port_settings;
 };
 

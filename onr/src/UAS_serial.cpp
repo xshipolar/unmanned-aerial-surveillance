@@ -53,9 +53,16 @@ bool UAS_serial::beginPort(uint32_t baudrate){
 /**
  * @brief close the serial port
  */
-void UAS_serial::closePort()
-{
+void UAS_serial::closePort(){
   close(_serial_id);
+}
+
+/**
+ * @brief get the name of the port
+ * @return -- string of the name of the port
+ */
+const char* UAS_serial::getDeviceName() {
+  return _device_name;
 }
 
 /**
