@@ -37,21 +37,17 @@ iostream
 -
 
 ../include/quad.h
-opencv2/opencv.hpp
--
 opencv2/legacy/legacy.hpp
--
-tld_utils.h
--
-LKTracker.h
--
-FerNNClassifier.h
 -
 fstream
 -
 cv.h
 ../include/cv.h
 iostream
+-
+stdio.h
+-
+tld_utils.h
 -
 
 ../include/tld_utils.h

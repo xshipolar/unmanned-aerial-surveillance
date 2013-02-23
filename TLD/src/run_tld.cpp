@@ -9,6 +9,7 @@
 
 using namespace cv;
 using namespace std;
+
 //Global variables
 Rect box;
 bool drawing_box = false;
@@ -20,7 +21,7 @@ string video;
 int lot=0;
 bool stopVideo=false;
 time_t t1;
-int X1,Y1,X2,Y2;
+int X1,Y1,X2,Y2,x01,y01,x02,y02;
 double vert;
 double hori;
 double moti;
@@ -198,7 +199,7 @@ REPEAT:
     if (status){
       drawPoints(frame,pts1);
       drawPoints(frame,pts2,Scalar(0,255,0));
-	  guidance(pbox.x,pbox.y,pbox.x+pbox.width,pbox.y+pbox.height);
+	    guidance(pbox.x,pbox.y,pbox.x+pbox.width,pbox.y+pbox.height);
       drawBox(frame,pbox);
       detections++;
     }
@@ -237,6 +238,7 @@ REPEAT:
 }
 void guidance(int x_1,int y_1,int x_2,int y_2)
 {
+  arr1={x_1,y_1,x_2,y_2};	
 	int area2=((x_2-x_1)*(y_2-y_1));
 	int area1=((X2-X1)*(Y2-Y1));
 	if(area2>area1)
@@ -268,6 +270,7 @@ void guidance(int x_1,int y_1,int x_2,int y_2)
 	else
 	hori=0;
 	cout<<hori<<"\t"<<vert<<"\t"<<moti<<"\n";
+  arr={hori,vert,moti};
 	X2=x_2;
 	Y2=y_2;
 	X1=x_1;
@@ -275,6 +278,11 @@ void guidance(int x_1,int y_1,int x_2,int y_2)
 }
 double* get_guidance()
 {
-	double arr[]={hori,vert,moti};
+	arr={hori,vert,moti};
 	return arr;
 }	
+int* tracked_points()
+{
+	arr1={x01,y01,x02,y02};
+	return arr1;
+}
