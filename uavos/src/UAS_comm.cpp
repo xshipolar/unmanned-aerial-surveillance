@@ -25,20 +25,16 @@ void UAS_comm::init(){
     _apm_initialised = _comm_apm->beginPort(115200);
     _gcs_initialised = _comm_gcs->beginPort(57600); 
 
-    printf("_apm_initialised = %d\n",_apm_initialised);
-    printf("_gcs_initialised = %d\n",_gcs_initialised);
-   
-    // if (_apm_initialised) {
-    //     printf("Port to APM is initialised at %s\n",_comm_apm->getDeviceName() );
-    // } else {
-    //     printf("Port to APM failed to initialised");
-    // }
-    // if (_gcs_initialised) {
-    //     printf("Port to GCS is initialised at %s\n",_comm_gcs->getDeviceName() );
-    // } else {
-    //     printf("Port to GCS failed to initialised");
-    // }
-
+    if (_apm_initialised) {
+        printf("Port to APM is initialised at %s\n",_comm_apm->getDeviceName() );
+    } else {
+        printf("Port to APM failed to initialised\n");
+    }
+    if (_gcs_initialised) {
+        printf("Port to GCS is initialised at %s\n",_comm_gcs->getDeviceName() );
+    } else {
+        printf("Port to GCS failed to initialised\n");
+    }
 
     // assign mavlink_channels to each link
     _chan_apm = MAVLINK_COMM_0; 
