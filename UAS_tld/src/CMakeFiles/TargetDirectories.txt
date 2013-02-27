@@ -1,5 +1,0 @@
-/home/labuser/uastracking/TLD_tracking_images/src/CMakeFiles/LKTracker.dir
-/home/labuser/uastracking/TLD_tracking_images/src/CMakeFiles/ferNN.dir
-/home/labuser/uastracking/TLD_tracking_images/src/CMakeFiles/run_tld.dir
-/home/labuser/uastracking/TLD_tracking_images/src/CMakeFiles/tld.dir
-/home/labuser/uastracking/TLD_tracking_images/src/CMakeFiles/tld_utils.dir

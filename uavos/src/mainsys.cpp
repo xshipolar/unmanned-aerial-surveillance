@@ -18,7 +18,7 @@ int main() {
 }
 
 /**
- * 
+ * @brief Initialization function for each subsystem;
  */
 void initialize() {
     // Reference Time

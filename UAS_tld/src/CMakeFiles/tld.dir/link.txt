@@ -1,2 +1,0 @@
-/usr/bin/ar cr /home/labuser/uastracking/TLD_tracking_images/lib/libtld.a  CMakeFiles/tld.dir/TLD.o
-/usr/bin/ranlib /home/labuser/uastracking/TLD_tracking_images/lib/libtld.a
