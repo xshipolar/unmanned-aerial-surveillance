@@ -5,7 +5,7 @@
  *      Author: Xichen Shi
  */
 
-#include <sensor.hpp>
+#include <datasys.hpp>
 
 global_position_t g_global_position;
 attitude_t        g_attitude;

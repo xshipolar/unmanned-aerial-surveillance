@@ -15,7 +15,7 @@
 #include <mavlink/ardupilotmega/mavlink.h>
 
 #include <UAS_serial.hpp>
-#include <sensor.hpp>
+#include <datasys.hpp>
 
 using namespace std;
 

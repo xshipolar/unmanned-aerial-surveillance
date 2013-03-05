@@ -8,11 +8,12 @@
 #ifndef MAINSYS_HPP_
 #define MAINSYS_HPP_
 
-#include <UAS_serial/UAS_serial.hpp>
+#include <UAS_serial.hpp>
 #include <UAS_comm.hpp>
 #include <utility.hpp>
-#include <sensor.hpp>
+#include <datasys.hpp>
 #include <comsys.hpp>
+#include <visionsys.hpp>
 
 void initialize();
 

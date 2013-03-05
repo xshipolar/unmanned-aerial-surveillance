@@ -5,8 +5,8 @@
  *      Author: Xichen Shi
  */
 
-#ifndef SENSOR_HPP_
-#define SENSOR_HPP_
+#ifndef DATASYS_HPP
+#define DATASYS_HPP
 
 #include <inttypes.h>
 
@@ -37,4 +37,4 @@ void updateGlobalPosition(int32_t lat, int32_t lon, int32_t alt, int32_t relativ
 
 void updateAttitude(float roll, float pitch, float yaw, float rollspeed, float pitchspeed, float yawspeed);
 
-#endif /* SENSOR_HPP_ */
+#endif /* DATASYS_HPP */

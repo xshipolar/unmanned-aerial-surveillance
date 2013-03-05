@@ -5,7 +5,7 @@ if(COMMAND cmake_policy)
      cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
 #set project name
-project(TLD)
+project(UAS_tld)
 
 #Append path to the module path
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})
@@ -17,6 +17,6 @@ add_library(ferNN FerNNClassifier.cpp)
 add_library(tld TLD.cpp)
 add_library(UAS_tld UAS_tld.cpp)
 
-set(UAS_tld_LIBS UAS_tld ferNN LKTracker tld_utils tld_utils)
+set(UAS_tld_LIBS UAS_tld tld ferNN LKTracker tld_utils PARENT_SCOPE)
 
 
