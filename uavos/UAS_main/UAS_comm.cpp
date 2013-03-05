@@ -9,21 +9,87 @@
 #include <UAS_comm.hpp>
 
 /**
+ * @brief -- Default Constructor for comm system
+ */
+UAS_comm::UAS_comm() {
+}
+
+/**
  * @brief -- Constructor for comm system
  * @param -- two serial classes for comm with APM and GCS
  */
 UAS_comm::UAS_comm(UAS_serial* serial_apm, UAS_serial* serial_gcs) {
-    _comm_apm = serial_apm; // void pointer to each class
+    _comm_apm = serial_apm; 
     _comm_gcs = serial_gcs;
 }
 
 /**
  * @brief -- initialize comm system by opening two serial ports
+ * @param serial_apm -- pointer to apm serial
+ * @param serial_gcs -- pointer to gcs serial
  */
-void UAS_comm::init(){
-     // open ports with baudrate specified
-    _apm_initialised = _comm_apm->beginPort(115200);
-    _gcs_initialised = _comm_gcs->beginPort(57600); 
+void UAS_comm::init(UAS_serial* serial_apm, UAS_serial* serial_gcs){
+    // Designate Ports
+    _comm_apm = serial_apm; 
+    _comm_gcs = serial_gcs;
+
+    // open ports with baudrate specified
+    _apm_initialised = _comm_apm->isOpened();
+    _gcs_initialised = _comm_gcs->isOpened(); 
+
+    if (_apm_initialised) {
+        printf("Port to APM is initialised at %s\n",_comm_apm->getDeviceName() );
+    } else {
+        printf("Port to APM failed to initialised\n");
+    }
+    if (_gcs_initialised) {
+        printf("Port to GCS is initialised at %s\n",_comm_gcs->getDeviceName() );
+    } else {
+        printf("Port to GCS failed to initialised\n");
+    }
+
+    // assign mavlink_channels to each link
+    _chan_apm = MAVLINK_COMM_0; 
+    _chan_gcs = MAVLINK_COMM_1;
+}
+
+/**
+ * @brief -- initialize comm system by opening two serial ports with defined baudrate
+ * @param baudrate_apm --
+ * @param baudrate_gcs --
+ */
+void UAS_comm::init(uint32_t baudrate_apm, uint32_t baudrate_gcs){
+    // open ports with baudrate specified
+    _apm_initialised = _comm_apm->beginPort(baudrate_apm);
+    _gcs_initialised = _comm_gcs->beginPort(baudrate_gcs); 
+
+    if (_apm_initialised) {
+        printf("Port to APM is initialised at %s\n",_comm_apm->getDeviceName() );
+    } else {
+        printf("Port to APM failed to initialised\n");
+    }
+    if (_gcs_initialised) {
+        printf("Port to GCS is initialised at %s\n",_comm_gcs->getDeviceName() );
+    } else {
+        printf("Port to GCS failed to initialised\n");
+    }
+
+    // assign mavlink_channels to each link
+    _chan_apm = MAVLINK_COMM_0; 
+    _chan_gcs = MAVLINK_COMM_1;
+}
+
+/**
+ * @brief -- initialize comm system by opening two serial ports with defined name and baudrate
+ * @param serial_name_apm -- device name for apm serial link
+ * @param serial_name_gcs -- device name for gcs serial link
+ * @param baudrate_apm --
+ * @param baudrate_gcs --
+ */
+void UAS_comm::init(const char* serial_name_apm, const char* serial_name_gcs, uint32_t baudrate_apm, uint32_t baudrate_gcs){
+    // open ports with baudrate specified
+    _apm_initialised = _comm_apm->beginPort(serial_name_apm, baudrate_apm);
+    _gcs_initialised = _comm_gcs->beginPort(serial_name_gcs, baudrate_gcs); 
 
     if (_apm_initialised) {
         printf("Port to APM is initialised at %s\n",_comm_apm->getDeviceName() );

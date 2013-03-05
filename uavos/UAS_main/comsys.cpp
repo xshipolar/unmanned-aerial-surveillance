@@ -10,15 +10,17 @@
 
 #include <comsys.hpp>
 
-UAS_serial Serial_apm("/dev/ttyACM0");
-UAS_serial Serial_gcs("/dev/ttyS0");
-UAS_comm comModule(&Serial_apm, &Serial_gcs);
+static UAS_serial Serial_apm;
+static UAS_serial Serial_gcs;
+static UAS_comm comModule;
 
 /**
  * @brief -- initialize communication system
  */
 void initComsys() {
-    comModule.init(); // initialize communication subsystem
+    Serial_apm.beginPort("/dev/ttyACM0", 115200);
+    Serial_gcs.beginPort("/dev/ttyS0", 57600);
+    comModule.init(&Serial_apm, &Serial_gcs); // initialize communication subsystem
 }
 
 /**

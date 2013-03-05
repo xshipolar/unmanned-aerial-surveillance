@@ -14,7 +14,7 @@
 #include <cstdio>
 #include <mavlink/ardupilotmega/mavlink.h>
 
-#include <UAS_serial/UAS_serial.hpp>
+#include <UAS_serial.hpp>
 #include <sensor.hpp>
 
 using namespace std;
@@ -22,10 +22,15 @@ using namespace std;
 class UAS_comm
 {
 public:
+    // Constructors
+    UAS_comm();
     UAS_comm(UAS_serial* serial_apm, UAS_serial* serial_gcs);
     //~UAS_comm();
 
-    void init();
+    // Initializers
+    void init(UAS_serial* serial_apm, UAS_serial* serial_gcs);
+    void init(uint32_t baudrate_apm, uint32_t baudrate_gcs);
+    void init(const char* serial_name_apm, const char* serial_name_gcs, uint32_t baudrate_apm, uint32_t baudrate_gcs);
 
     void updateApm();
     void updateGcs();
