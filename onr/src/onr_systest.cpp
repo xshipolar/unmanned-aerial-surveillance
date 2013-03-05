@@ -57,7 +57,7 @@ static unsigned long lastSendTime = 0;
 /////////////////////////////////////////////////////////////////////
 ////////////////////////// Video Src ////////////////////////////////
 /////////////////////////////////////////////////////////////////////
-VideoCapture videoSrc0(1);
+VideoCapture videoSrc0(0);
 const char *window1 = "Video";
 int frameCount = 0;
    
@@ -115,7 +115,7 @@ void sendMessage(int msgID)
         mavlink_msg_heartbeat_send(MAVLINK_COMM_0, 0, MAV_AUTOPILOT_ARDUPILOTMEGA, 0,0,0);
         break;
     case MAVLINK_MSG_ID_REQUEST_DATA_STREAM:
-        mavlink_msg_request_data_stream_pack(255,0,&msg, 1, 1, MAV_DATA_STREAM_RAW_SENSORS, 100, 1);
+        mavlink_msg_request_data_stream_pack(255,0,&msg, 1, 1, MAV_DATA_STREAM_RAW_SENSORS, 50, 1);
         mavlink_msg_to_send_buffer(buf, &msg);
         if(Serial1.send(&buf,sizeof(buf))==sizeof(buf)){
             printf("RawSensors stream request sent.\n");
@@ -125,6 +125,7 @@ void sendMessage(int msgID)
         //mavlink_msg_to_send_buffer(buf, &msg);
         //Serial1.send(buf);
         
+        /*
         mavlink_msg_request_data_stream_pack(255,0,&msg, 1, 1, MAV_DATA_STREAM_EXTENDED_STATUS, 5, 1);
         mavlink_msg_to_send_buffer(buf, &msg);
         if(Serial1.send(&buf,sizeof(buf))==sizeof(buf)){
@@ -147,7 +148,7 @@ void sendMessage(int msgID)
         mavlink_msg_to_send_buffer(buf, &msg);
         if(Serial1.send(&buf,sizeof(buf))==sizeof(buf)){
             printf("Extra3 stream request sent.\n");
-        }
+        }*/
         break;
     default:
         break;
@@ -166,7 +167,7 @@ void handleMessage()
                 mavlink_raw_imu_t raw_imu;
                 mavlink_msg_raw_imu_decode(&msg, &raw_imu);
                 fprintf(logIMU, "%12d,%10d,%10d,%10d,%10d,%10d,%10d,\n",microSecond(),raw_imu.xacc,raw_imu.yacc,raw_imu.zacc,raw_imu.xgyro,raw_imu.ygyro,raw_imu.zgyro);
-                //printf("%12d,%10d,%10d,%10d,%10d,%10d,%10d,\n",microSecond(),raw_imu.xacc,raw_imu.yacc,raw_imu.zacc,raw_imu.xgyro,raw_imu.ygyro,raw_imu.zgyro);
+                printf("%12d,%10d,%10d,%10d,%10d,%10d,%10d,\n",microSecond(),raw_imu.xacc,raw_imu.yacc,raw_imu.zacc,raw_imu.xgyro,raw_imu.ygyro,raw_imu.zgyro);
                 break;      
                 
             case MAVLINK_MSG_ID_GPS_RAW_INT:
