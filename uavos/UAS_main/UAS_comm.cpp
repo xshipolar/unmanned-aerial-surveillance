@@ -40,12 +40,12 @@ void UAS_comm::init(UAS_serial* serial_apm, UAS_serial* serial_gcs){
     if (_apm_initialised) {
         printf("Port to APM is initialised at %s\n",_comm_apm->getDeviceName() );
     } else {
-        printf("Port to APM failed to initialised\n");
+        printf("Port to APM failed to initialised at %s\n", _comm_apm->getDeviceName());
     }
     if (_gcs_initialised) {
-        printf("Port to GCS is initialised at %s\n",_comm_gcs->getDeviceName() );
+        printf("Port to GCS is initialised at %s\n", _comm_gcs->getDeviceName() );
     } else {
-        printf("Port to GCS failed to initialised\n");
+        printf("Port to GCS failed to initialised at %s\n", _comm_gcs->getDeviceName());
     }
 
     // assign mavlink_channels to each link
@@ -66,14 +66,14 @@ void UAS_comm::init(uint32_t baudrate_apm, uint32_t baudrate_gcs){
     if (_apm_initialised) {
         printf("Port to APM is initialised at %s\n",_comm_apm->getDeviceName() );
     } else {
-        printf("Port to APM failed to initialised\n");
+        printf("Port to APM failed to initialised at %s\n", _comm_apm->getDeviceName());
     }
     if (_gcs_initialised) {
-        printf("Port to GCS is initialised at %s\n",_comm_gcs->getDeviceName() );
+        printf("Port to GCS is initialised at %s\n", _comm_gcs->getDeviceName() );
     } else {
-        printf("Port to GCS failed to initialised\n");
+        printf("Port to GCS failed to initialised at %s\n", _comm_gcs->getDeviceName());
     }
-
+    
     // assign mavlink_channels to each link
     _chan_apm = MAVLINK_COMM_0; 
     _chan_gcs = MAVLINK_COMM_1;
@@ -94,12 +94,12 @@ void UAS_comm::init(const char* serial_name_apm, const char* serial_name_gcs, ui
     if (_apm_initialised) {
         printf("Port to APM is initialised at %s\n",_comm_apm->getDeviceName() );
     } else {
-        printf("Port to APM failed to initialised\n");
+        printf("Port to APM failed to initialised at %s\n", _comm_apm->getDeviceName());
     }
     if (_gcs_initialised) {
-        printf("Port to GCS is initialised at %s\n",_comm_gcs->getDeviceName() );
+        printf("Port to GCS is initialised at %s\n", _comm_gcs->getDeviceName() );
     } else {
-        printf("Port to GCS failed to initialised\n");
+        printf("Port to GCS failed to initialised at %s\n", _comm_gcs->getDeviceName());
     }
 
     // assign mavlink_channels to each link
