@@ -9,6 +9,7 @@
 #include <fstream>
 #include "cv.h"
 #include <iostream>
+#include <stdio.h>
 
 //Bounding Boxes
 struct BoundingBox : public cv::Rect {
