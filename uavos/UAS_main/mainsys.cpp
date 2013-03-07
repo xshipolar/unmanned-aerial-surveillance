@@ -6,8 +6,10 @@
  */
 
 #include <mainsys.hpp>
+#include <ui.hpp>
 
 int main() {
+    
     initialize();
     
     pthread_t thread1;
@@ -25,5 +27,6 @@ void initialize() {
     program_start_time = getMicroSecond(); // get the reference time in u_sec (microseconds) when system
     initComsys();
     initVisionsys();
-    initUisys();
+    uiModule.init_ui();
+    uiModule.load_ui();
 }

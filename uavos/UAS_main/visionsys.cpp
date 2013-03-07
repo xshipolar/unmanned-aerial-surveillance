@@ -20,8 +20,9 @@ void initVisionsys(){
  * @brief 
  */
 void* runVisionsys(void*){
-    if(visionModule.isInitialised()==true)
-
+    if(visionModule.isInitialised()==false)
+    exit(0);	
+	
 
     while(true){
 

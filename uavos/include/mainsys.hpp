@@ -18,4 +18,6 @@
 
 void initialize();
 
+extern UAS_UI uiModule;
+
 #endif /* MAINSYS_HPP_ */
