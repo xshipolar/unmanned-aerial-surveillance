@@ -15,7 +15,13 @@
 void UAS_UI::init_ui()
 {
 	head=new_state(MAIN,ON);		//Initializes head to MAIN and turns mode ON
+}
 
+bool UAS_UI::isInitialized()
+{
+	if(head==NULL)					//Checking to see if the head is initialized
+	return false;
+	return true;
 }
 /* load_ui()
  *	Description : Load ui with a sample state diagram

@@ -26,6 +26,7 @@ class UAS_UI
 	public:
 
 	extern void init_ui();
+	extern bool is_Initialized():
 	extern void load_ui();
 	extern ui_struct* new_state(state name,mode val);
 	extern ui_struct* find_state(state name);
