@@ -18,7 +18,7 @@ UAS_tld::UAS_tld() {
  */
 void UAS_tld::init(){
     // open the first video capture device
-    _capture_device.open(0);
+    _capture_device.open(1);
     // open the yml file containing the setting paramters and read setttings
     _parameter_file.open("../parameters.yml", FileStorage::READ);
 
@@ -41,6 +41,7 @@ void UAS_tld::init(){
 
         // Set TLD with stored paramters
         _tld_vision.read(_parameter_file.getFirstTopLevelNode());
+        _tld_initialised = true;
         printf("TLD vision is initialised\n");
     }
 }

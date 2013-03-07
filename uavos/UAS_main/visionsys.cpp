@@ -14,6 +14,7 @@ Rect box;
 Mat frame;
 bool gotBB = false;
 bool drawing_box = false;
+int lot = 0;
 
 /**
  * @brief initialise vision system
@@ -60,17 +61,23 @@ void* runVisionsys(void*){
 
             visionModule.readyTracking(box);
         }
-
+        time_t t1=time(0);
         // Loop to update TLD tracking
         while(start_track && g_system_status.navigation_mode == NAV_MODE_SEMIAUTO){
             visionModule.updateTracking();
             if (visionModule._track_status) {
-                cout << "drawing box" << endl;
-                drawPoints(visionModule._current_color_frame,visionModule._previous_features);
-                drawPoints(visionModule._current_color_frame,visionModule._current_features,Scalar(0,255,0));
                 drawBox(visionModule._current_color_frame,visionModule._target_box);
             }
-            imshow("TLD",frame);
+            time_t t2=time(0);
+            lot++;
+            if(difftime(t2,t1)>1)
+            {
+                double fr=(double)lot/(double)difftime(t2,t1);
+                cout << "Frame Rate : "<< fr <<"\n";
+                lot=0;
+                t1=t2;
+            }
+            //imshow("TLD",frame);
             if (cvWaitKey(33) == 'q') break;
         }
     }
