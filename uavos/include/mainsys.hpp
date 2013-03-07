@@ -14,6 +14,7 @@
 #include <datasys.hpp>
 #include <comsys.hpp>
 #include <visionsys.hpp>
+#include <uisys.hpp>
 
 void initialize();
 
