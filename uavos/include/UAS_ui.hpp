@@ -17,7 +17,7 @@ enum mode {ON,OFF,NOT_DEFINED};			//Mode of status
 
 ui_struct* head;
 
-class UAS_UI
+class UAS_ui
 {
 	private:
 

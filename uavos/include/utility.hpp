@@ -13,6 +13,8 @@
 
 extern unsigned long program_start_time;
 
-unsigned long getMicroSecond();
+unsigned long getMicroSeconds();
+
+unsigned long getMilliSeconds();
 
 #endif /* UTILITY_HPP_ */

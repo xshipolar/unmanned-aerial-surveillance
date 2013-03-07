@@ -12,6 +12,6 @@ add_library(visionsys visionsys.cpp)
 add_executable(mainsys mainsys.cpp)
 
 # link 
-target_link_libraries(mainsys comsys UAS_comm UAS_serial sensor utility pthread visionsys ${UAS_tld_LIBS} ${OpenCV_LIBS})
+target_link_libraries(mainsys comsys UAS_comm UAS_serial datasys utility pthread visionsys ${UAS_tld_LIBS} ${OpenCV_LIBS})
 
 set(CMAKE_BUILD_TYPE Release)

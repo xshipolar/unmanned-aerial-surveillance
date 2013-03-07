@@ -10,14 +10,15 @@
 
 #include <UAS_serial.hpp>
 #include <UAS_comm.hpp>
+//#include <UAS_ui.hpp>
 #include <utility.hpp>
 #include <datasys.hpp>
 #include <comsys.hpp>
 #include <visionsys.hpp>
-#include <uisys.hpp>
+
 
 void initialize();
 
-extern UAS_UI uiModule;
+//extern UAS_UI uiModule;
 
 #endif /* MAINSYS_HPP_ */

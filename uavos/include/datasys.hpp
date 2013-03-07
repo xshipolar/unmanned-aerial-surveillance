@@ -10,6 +10,7 @@
 
 #include <inttypes.h>
 
+// sensor related structs 
 struct global_position_t {
     int32_t lat; ///< Latitude, expressed as * 1E7
     int32_t lon; ///< Longitude, expressed as * 1E7
@@ -30,8 +31,29 @@ struct attitude_t {
     float yawspeed; ///< Yaw angular speed (rad/s)
 };
 
-extern attitude_t        g_attitude;
-extern global_position_t g_global_position;
+// system status related structs and enums
+enum UAS_navigation_mode_t {
+    NAV_MODE_IDLE,
+    NAV_MODE_SEMIAUTO,
+    NAV_MODE_AUTO,
+    NAV_MODE_END // Always end this
+};
+
+enum UAS_system_state_t {
+    SYSTEM_STATE_INITIALIZING,
+    SYSTEM_STATE_ACTIVE,
+    SYSTEM_STATE_END // Always end this
+};
+
+struct system_status_t {
+    uint8_t navigation_mode;   // mode of the uav operating system
+    uint8_t system_state;  // stage of the current system during operation, e.g initialization, mainloop, etc.
+};
+
+// Prototypes and globals
+extern attitude_t           g_attitude;
+extern global_position_t    g_global_position;
+extern system_status_t      g_system_status;
 
 void updateGlobalPosition(int32_t lat, int32_t lon, int32_t alt, int32_t relative_alt, int16_t vx, int16_t vy, int16_t vz, uint16_t hdg);
 

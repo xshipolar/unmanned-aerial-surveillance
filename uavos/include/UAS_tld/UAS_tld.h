@@ -31,23 +31,23 @@ public:
 
     bool isInitialised();
 
-private:
     VideoCapture _capture_device;
     FileStorage  _parameter_file;
+    BoundingBox  _target_box;
+    vector<Point2f> _current_features;
+    vector<Point2f> _previous_features;
+    bool _track_status;
+    Mat  _current_color_frame;
+
+private:
     TLD          _tld_vision;
 
     bool _capture_device_opened;
     bool _parameter_file_opened;
     bool _tld_initialised;
-    bool _track_status;
-
-    Mat  _current_color_frame;
+    
     Mat  _current_gray_frame;
     Mat  _previous_gray_frame;
-
-    vector<Point2f> _current_features;
-    vector<Point2f> _previous_features;
-    BoundingBox _target_box;
 };
 
 #endif /* UAS_TLD_H_ */

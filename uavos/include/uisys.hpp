@@ -8,8 +8,7 @@
 #ifndef UISYS_HPP_
 #define UISYS_HPP_
 
-#include <ui.hpp>
-
+#include <UAS_ui.hpp>
 
 void initVisionsys();
 
