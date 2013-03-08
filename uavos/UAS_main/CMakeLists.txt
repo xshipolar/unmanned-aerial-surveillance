@@ -11,9 +11,12 @@ add_library(datasys datasys.cpp)
 add_library(comsys comsys.cpp)
 add_library(visionsys visionsys.cpp)
 add_library(uisys uisys.cpp)
+add_library(UAS_nav UAS_nav.cpp)
+add_library(navsys navsys.cpp)
 add_executable(mainsys mainsys.cpp)
 
+
 # link 
-target_link_libraries(mainsys comsys UAS_comm UAS_serial pthread visionsys uisys UAS_ui datasys utility ${UAS_tld_LIBS} ${OpenCV_LIBS})
+target_link_libraries(mainsys comsys UAS_comm UAS_serial pthread uisys UAS_ui datasys navsys visionsys UAS_nav utility ${UAS_tld_LIBS} ${OpenCV_LIBS})
 
 set(CMAKE_BUILD_TYPE Release)

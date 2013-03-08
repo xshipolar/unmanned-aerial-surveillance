@@ -50,10 +50,22 @@ struct system_status_t {
     uint8_t system_state;  // stage of the current system during operation, e.g initialization, mainloop, etc.
 };
 
+
+struct gimbal
+{
+    /* data: Euler angles for Gimbal obtained from */
+    double tilt;            //Tilt angle in 100degrees
+    double pan;             //Pan angle in 100degrees
+};
+
+
+
 // Prototypes and globals
 extern attitude_t           g_attitude;
 extern global_position_t    g_global_position;
 extern system_status_t      g_system_status;
+extern gimbal               g_gimbal_input;     //Input in 100*degrees
+extern gimbal               g_gimbal_output;
 
 void updateGlobalPosition(int32_t lat, int32_t lon, int32_t alt, int32_t relative_alt, int16_t vx, int16_t vy, int16_t vz, uint16_t hdg);
 

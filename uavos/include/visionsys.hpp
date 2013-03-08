@@ -13,9 +13,19 @@
 #include <cstdio>
 #include <utility.hpp>
 
+struct centroid
+{
+    int x;
+    int y;
+ };
+
+extern bool tracking_started;
+
 void initVisionsys();
 
 void* runVisionsys(void*);
+
+centroid find_centroid();
 
 void mouseHandler(int event, int x, int y, int flags, void *param);
 

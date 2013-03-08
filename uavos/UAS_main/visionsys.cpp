@@ -15,13 +15,16 @@ Mat frame;
 bool gotBB = false;
 bool drawing_box = false;
 int lot = 0;
-
+bool tracking_started;
 /**
  * @brief initialise vision system
  */
 void initVisionsys(){
     last_time_visionsys = getMilliSeconds();
+    //g_centroid.x=0;
+    //g_centroid.y=0;
     visionModule.init();
+    tracking_started=true;
 }
 
 
@@ -64,20 +67,23 @@ void* runVisionsys(void*){
         time_t t1=time(0);
         // Loop to update TLD tracking
         while(start_track && g_system_status.navigation_mode == NAV_MODE_SEMIAUTO){
+            tracking_started=true;
             visionModule.updateTracking();
             if (visionModule._track_status) {
                 drawBox(visionModule._current_color_frame,visionModule._target_box);
+                
+                
             }
             time_t t2=time(0);
             lot++;
             if(difftime(t2,t1)>1)
             {
                 double fr=(double)lot/(double)difftime(t2,t1);
-                cout << "Frame Rate : "<< fr <<"\n";
+                //cout << "Frame Rate : "<< fr <<"\n";
                 lot=0;
                 t1=t2;
             }
-            //imshow("TLD",frame);
+            imshow("TLD",frame);
             if (cvWaitKey(33) == 'q') break;
         }
     }
@@ -87,6 +93,15 @@ void* runVisionsys(void*){
 /**
  * @brief initialise vision system
  */
+
+centroid find_centroid()
+{
+    centroid c;
+    c.x=visionModule._target_box.x+(visionModule._target_box.width)/2;
+    c.y=visionModule._target_box.y+(visionModule._target_box.height)/2;
+    return c;
+
+}
 void mouseHandler(int event, int x, int y, int flags, void *param){
     switch( event ){
     case CV_EVENT_MOUSEMOVE:
