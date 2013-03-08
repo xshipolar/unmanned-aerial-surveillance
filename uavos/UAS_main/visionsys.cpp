@@ -15,7 +15,7 @@ Mat frame;
 bool gotBB = false;
 bool drawing_box = false;
 int lot = 0;
-bool tracking_started;
+bool tracking_started = false;
 /**
  * @brief initialise vision system
  */
@@ -24,7 +24,6 @@ void initVisionsys(){
     //g_centroid.x=0;
     //g_centroid.y=0;
     visionModule.init();
-    tracking_started=true;
 }
 
 
@@ -99,6 +98,7 @@ centroid find_centroid()
     centroid c;
     c.x=visionModule._target_box.x+(visionModule._target_box.width)/2;
     c.y=visionModule._target_box.y+(visionModule._target_box.height)/2;
+    tracking_started=true;
     return c;
 
 }

@@ -1,4 +1,5 @@
 #include <UAS_nav.hpp>
+#include <math.h>
 
 using namespace std;
 using namespace arma;
@@ -21,8 +22,8 @@ gimbal_angle gimbal_calculate(double u, double v, double uc, double vc, double p
 	Rci(1,0)=-sin(yaw); 		  Rci(1,1)=cos(yaw); 			Rci(1,2)=0;
 	Rci(2,0)=sin(yaw); 			  Rci(2,1)=sin(yaw)*sin(pitch);	Rci(2,2)=cos(pitch);
 
-	e_pitch = k1*atan2((v - vc)/focl);
-	e_yaw = k2*atan2((u - uc)/focl);
+	e_pitch = k1*atan2((v - vc),focl);
+	e_yaw = k2*atan2((u - uc),focl);
 
 	Rec(0,0)=cos(e_pitch)*cos(e_yaw); Rec(0,1)=cos(e_pitch)*sin(e_yaw); Rec(0,2)=-sin(e_pitch);
 	Rec(1,0)=-sin(e_yaw); 		  	  Rec(1,1)=cos(e_yaw); 				Rec(1,2)=0;
