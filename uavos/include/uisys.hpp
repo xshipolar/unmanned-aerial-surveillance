@@ -9,9 +9,20 @@
 #define UISYS_HPP_
 
 #include <UAS_ui.hpp>
+#include <opencv2/opencv.hpp>
+#include <stdio.h>
 
-void initVisionsys();
 
-void* runVisionsys(void*);
+void initUisys();
+
+void* runUisys(void*);
+
+bool read_flag=false;
+
+bool set_state_flag=false;
+
+bool check_state_flag=false;
+
+bool exit_flag=false;
 
 #endif /* UISYS_HPP_ */

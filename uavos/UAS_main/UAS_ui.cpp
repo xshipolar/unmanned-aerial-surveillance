@@ -5,16 +5,21 @@
  *      Author: Shubham Gupta
  */
 #include <UAS_ui.hpp>
-
+#include <string>
+#include <stdlib.h>
+//using namespace std;
 /* init_ui()
  *	Description : Initialize ui
  *	Inputs : none
  *	Outputs : none
  *  Special Mention : none
  */	
+using namespace std;
+UAS_ui::UAS_ui() {
+}
 void UAS_ui::init_ui()
 {
-	head=new_state(MAIN,ON);		//Initializes head to MAIN and turns mode ON
+	head=new_state("MAIN","",ON);		//Initializes head to MAIN and turns mode ON
 }
 
 bool UAS_ui::isInitialized()
@@ -31,11 +36,15 @@ bool UAS_ui::isInitialized()
  */	
 void UAS_ui::load_ui()
 {
-	add_state(MAIN,NAVIGATION,ON);				//MAIN->NAVIGATION(OM)
-	add_state(MAIN,VISION,ON);					//MAIN->VISION(ON)
-	add_state(MAIN,COMMUNICATION,ON);			//MAIN->COMMUNICATION(ON)
-	add_state(NAVIGATION,AUTO,OFF);				//MAIN->NAVIGATION->AUTO(OFF)
-	add_state(NAVIGATION,MANUAL,ON);			//MAIN->NAVIGATION->MANUAL(ON)
+	add_state("MAIN","READ DATA",OFF);				//MAIN->NAVIGATION(OM)
+	add_state("MAIN","CHECK STATE",OFF);					//MAIN->VISION(ON)
+	add_state("MAIN","CHANGE STATE",OFF);			//MAIN->COMMUNICATION(ON)
+	add_state("READ_STATE","GPS",OFF);				//MAIN->NAVIGATION->AUTO(OFF)
+	add_state("READ_STATE","IMU",OFF);			//MAIN->NAVIGATION->MANUAL(ON)
+	add_state("READ_STATE","CAMERA_ANGLE",OFF);
+	//add_state("CHANGE STATE","AUTO",OFF);
+	//add_state("CHANGE STATE","SEMI-AUTO",OFF);
+	//add_state("CHANGE STATE","MANUAL",OFF);
 }
 /* new_state()
  *	Description : Load ui with a sample state diagram
@@ -44,12 +53,17 @@ void UAS_ui::load_ui()
  *	Outputs : pointer to the new structure declared
  *  Special Mention : Returns NULL if state not found
  */
-ui_struct* UAS_ui::new_state(state name,mode value)
+ui_struct* UAS_ui::new_state(string state_head,string state_name,mode value)
 {
+	int i;
 	ui_struct* ptr=new ui_struct();		//Declaring new ui_struct
+	ptr->head=state_head;
 	ptr->name=state_name;
 	ptr->val=value;
-	ptr->nodes=new ui_struct*[5];
+	//ui_struct* temp=new ui_struct[5];
+	for(i=0;i<5;i++)
+	ptr->nodes[i]=new ui_struct;
+
 	ptr->no_of_nodes=0;
 
 }
@@ -60,7 +74,7 @@ ui_struct* UAS_ui::new_state(state name,mode value)
  *	Outputs : pointer to found state. 
  *  Special Mention : none
  */
-ui_struct* UAS_ui::find_state(ui_struct* current,state key)
+ui_struct* UAS_ui::find_state(ui_struct* current,string key)
 {
 	if(current==NULL)					//End of state diagram reached!
 		return NULL;					//Search unsuccessful in sub-tree
@@ -68,7 +82,7 @@ ui_struct* UAS_ui::find_state(ui_struct* current,state key)
 	if(current->name==key)				//Search successful!
 	return current;
 	for(int i=0;i<current->no_of_nodes;i++)
-	if((ret=find_state((current->nodes[i],key))!=NULL)
+	if((ret=find_state((current->nodes[i]),key))!=NULL)
 	break;
 	return ret;
 }
@@ -80,13 +94,13 @@ ui_struct* UAS_ui::find_state(ui_struct* current,state key)
  *	Outputs : #status of addition
  *  Special Mention : Returns -1 on error. Returns 0 on success
  */
-int UAS_ui::add_state(state add,state state_name,mode val)
+int UAS_ui::add_state(string add,string state_name,mode val)
 {
 	ui_struct* ptr;
-	ptr=find_state(head,name);			//Finding state
+	ptr=find_state(head,add);			//Finding state
 	if(ptr==NULL)
 	return -1;		//Error in finding name
-	ui_struct* new_ptr=new_state(state_name,val);
+	ui_struct* new_ptr=new_state(add,state_name,val);
 	if(ptr->no_of_nodes==0)
 	ptr->nodes[ptr->no_of_nodes]=new_ptr;
 	ptr->no_of_nodes++;
@@ -98,10 +112,10 @@ int UAS_ui::add_state(state add,state state_name,mode val)
  *	Outputs : #status of removal 
  *  Special Mention : Returns -1 on error and 0 on success
  */
-int UAS_ui::remove_state(state rem)
+int UAS_ui::remove_state(string rem)
 {
 	ui_struct* ptr;
-	ptr=find_state(head,name);
+	ptr=find_state(head,rem);
 	if(ptr==NULL)
 	return -1;		//Error in finding name
 	remove_state(ptr);
@@ -121,8 +135,8 @@ void UAS_ui::remove_state(ui_struct* node)
 		for(int i=0;i<node->no_of_nodes;i++)
 			remove_state(node->nodes[i]);			//Recursive removal of sub-states(if any)
 	}
-	free(node->nodes);
-	free(node);
+	free (node->nodes);
+	free (node);
 
 }
 /*  change_state_val()
@@ -132,7 +146,7 @@ void UAS_ui::remove_state(ui_struct* node)
  *	Outputs : #status of mode change
  *  Special Mention : Returns -1 on error and 0 on success
  */
-int UAS_ui::change_state_val(state name,mode new_val)
+int UAS_ui::change_state_val(string name,mode new_val)
 {
 	ui_struct* ptr;
 	ptr=find_state(head,name);					//Searching for state in state diagram
@@ -147,11 +161,11 @@ int UAS_ui::change_state_val(state name,mode new_val)
  *	Outputs : mode of existing state
  *  Special Mention : Returns NOT_DEFINED on error and mode on success
  */
-mode UAS_ui::poll_state(state poll)
+mode UAS_ui::poll_state(string poll)
 {
 	ui_struct* ptr;
-	ptr=find_state(head,name);
+	ptr=find_state(head,poll);
 	if(ptr==NULL)
 	return NOT_DEFINED;					//Error
-	return ptr->mode;
+	return ptr->val;
 }

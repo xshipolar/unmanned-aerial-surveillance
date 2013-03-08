@@ -1,38 +1,52 @@
 /*
- * ui.hpp
+ * UAS_ui.hpp
  *
  *  Created on: Mar 06, 2013
  *      Author: Shubham Gupta
  */
-typedef struct ui_struct{
-		state name;
-		mode val;
-		ui_struct* nodes[5];
-		int no_of_nodes};
 
+#ifndef UAS_UI_H_
+#define UAS_UI_H_
+#include <string> 
 
-enum state {MAIN,NAVIGATION,VISION,COMMUNICATION,AUTO,MANUAL};	//definingg new states
+using namespace std;
 
 enum mode {ON,OFF,NOT_DEFINED};			//Mode of status
 
-ui_struct* head;
+struct ui_struct{
+		string head;
+		string name;
+		mode val;
+		ui_struct* nodes[5];
+		int no_of_nodes;};
+
+
+//enum state {MAIN,READ_DATA,CHECK_STATE,CHANGE_STATE,GPS,IMU,ANGLE};	//definingg new states
+
+
+
 
 class UAS_ui
 {
-	private:
+	
+	public:
+	UAS_ui();
 
+	
+	void init_ui();
+	bool isInitialized();
+	void load_ui();
+	ui_struct* new_state(string state_head,string name,mode val);
+	ui_struct* find_state(ui_struct* current,string key);
+	int add_state(string add,string state_name,mode val);
+	int remove_state(string rem);
+	int change_state_val(string name,mode new_val);
+	mode poll_state(string poll);
+	ui_struct* head;
+
+	private:
 	void remove_state(ui_struct* node);
 
-	public:
+};
 
-	extern void init_ui();
-	extern bool is_Initialized():
-	extern void load_ui();
-	extern ui_struct* new_state(state name,mode val);
-	extern ui_struct* find_state(state name);
-
-	extern int add_state(state add,state state_name,mode val);
-	extern int remove_state(state rem);
-	extern int change_state_val(state level,mode new_val);
-	extern mode poll_state(state poll);
-}
+#endif /* UAS_UI_H_ */
