@@ -12,12 +12,16 @@
 #include <inttypes.h>
 #include <ctime>
 #include <cstdio>
-#include <mavlink/ardupilotmega/mavlink.h>
-
+#include <mavlink/mavlink_types.h>
 #include <UAS_serial.hpp>
 #include <datasys.hpp>
 
 using namespace std;
+
+// Globals for use in other systems
+extern UAS_serial Serial_apm;
+extern UAS_serial Serial_gcs;
+extern mavlink_system_t mavlink_system;
 
 class UAS_comm
 {
@@ -32,13 +36,15 @@ public:
     void init(uint32_t baudrate_apm, uint32_t baudrate_gcs);
     void init(const char* serial_name_apm, const char* serial_name_gcs, uint32_t baudrate_apm, uint32_t baudrate_gcs);
 
+    // Updates functions to be called periodically
     void updateApm();
     void updateGcs();
 
-    void bypassMessage(uint8_t chan, mavlink_message_t* msg);
-
     void parseApmMessage(mavlink_message_t* msg);
     void parseGcsMessage(mavlink_message_t* msg);
+
+    // Utility Functions 
+    void bypassMessage(uint8_t chan, mavlink_message_t* msg);
 
     void updateSensorData();
 
@@ -55,7 +61,6 @@ private:
     uint8_t _chan_apm; 
     uint8_t _chan_gcs;
 
-
     uint8_t _rx_buffer_apm[MAVLINK_MAX_PACKET_LEN];
     uint8_t _rx_buffer_gcs[MAVLINK_MAX_PACKET_LEN];
 
@@ -65,5 +70,27 @@ private:
     bool _apm_initialised;
     bool _gcs_initialised;
 };
+
+#define MAVLINK_USE_CONVENIENCE_FUNCTIONS
+
+/**
+ * @brief -- function used for convenience in mavlink
+ * @param chan -- channel of the message
+ * @param ch   -- character to write to port
+ */
+static inline void comm_send_ch(mavlink_channel_t chan, uint8_t ch) {
+    switch(chan){
+    case MAVLINK_COMM_0:
+        Serial_apm.send(&ch,1);
+        break;
+    case MAVLINK_COMM_1:
+        Serial_gcs.send(&ch,1);
+        break;
+    default:
+        break;
+    }
+}
+
+#include <mavlink/uas_mavlink/mavlink.h>
 
 #endif /* UAS_COMM_HPP_ */

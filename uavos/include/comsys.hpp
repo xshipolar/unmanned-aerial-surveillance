@@ -9,7 +9,9 @@
 #define COMSYS_HPP_
 
 #include <UAS_comm.hpp>
-
+#include <UAS_serial.hpp>
+#include <mavlink/mavlink_types.h>
+ 
 void initComsys();
 
 void *runApmLink(void*);

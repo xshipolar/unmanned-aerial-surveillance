@@ -8,6 +8,11 @@
 
 #include <UAS_comm.hpp>
 
+// Defining Serial classes and mavlink_system for global use
+UAS_serial Serial_apm;
+UAS_serial Serial_gcs;
+mavlink_system_t mavlink_system;
+
 /**
  * @brief -- Default Constructor for comm system
  */
@@ -149,15 +154,15 @@ void UAS_comm::updateGcs(){
  * @param msg -- the msg to be sent
  * @return -- NULL
  */
-void UAS_comm::bypassMessage(uint8_t chan, mavlink_message_t* msg){
+void UAS_comm::bypassMessage(uint8_t chan, mavlink_message_t* pMsg){
     uint8_t buf[MAVLINK_MAX_PACKET_LEN]; 
-    mavlink_msg_to_send_buffer(buf, msg);
+    mavlink_msg_to_send_buffer(buf, pMsg);
     
     if (chan == _chan_gcs){
-        _comm_gcs->send(&buf,sizeof(buf)); // send bypass msg to gcs
+        _comm_gcs->send(buf,sizeof(buf)); // send bypass msg to gcs
     }
     if (chan == _chan_apm){
-        _comm_apm->send(&buf,sizeof(buf)); // send bypass msg to apm
+        _comm_apm->send(buf,sizeof(buf)); // send bypass msg to apm
     }
 }
 

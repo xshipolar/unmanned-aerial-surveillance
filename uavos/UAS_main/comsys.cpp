@@ -10,9 +10,7 @@
 
 #include <comsys.hpp>
 
-static UAS_serial Serial_apm;
-static UAS_serial Serial_gcs;
-static UAS_comm comModule;
+UAS_comm comModule;
 
 /**
  * @brief -- initialize communication system
@@ -20,6 +18,8 @@ static UAS_comm comModule;
 void initComsys() {
     Serial_apm.beginPort("/dev/ttyACM0", 115200);
     Serial_gcs.beginPort("/dev/ttyS0", 57600);
+
+    mavlink_system.sysid = 255;
     comModule.init(&Serial_apm, &Serial_gcs); // initialize communication subsystem
 }
 
