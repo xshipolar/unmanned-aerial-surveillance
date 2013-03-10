@@ -36,13 +36,13 @@ enum UAS_navigation_mode_t {
     NAV_MODE_IDLE,
     NAV_MODE_SEMIAUTO,
     NAV_MODE_AUTO,
-    NAV_MODE_END // Always end this
+    NAV_MODE_END // Always end with this
 };
 
 enum UAS_system_state_t {
     SYSTEM_STATE_INITIALIZING,
     SYSTEM_STATE_ACTIVE,
-    SYSTEM_STATE_END // Always end this
+    SYSTEM_STATE_END // Always end with this
 };
 
 struct system_status_t {
@@ -51,21 +51,18 @@ struct system_status_t {
 };
 
 
-struct gimbal
-{
+struct gimbal_state_t {
     /* data: Euler angles for Gimbal obtained from */
-    double tilt;            //Tilt angle in 100degrees
-    double pan;             //Pan angle in 100degrees
+    double tilt_angle;            //Gimbal Tilt angle in 100*degrees
+    double pan_angle;             //Gimbal Pan  angle in 100*degrees
+    double roll_angle;            //Gimbal Roll angle in 100*degrees
 };
-
-
 
 // Prototypes and globals
 extern attitude_t           g_attitude;
 extern global_position_t    g_global_position;
 extern system_status_t      g_system_status;
-extern gimbal               g_gimbal_input;     //gimbal angles read from APM in 100*degrees
-extern gimbal               g_gimbal_output;    //gimbal angles to be sent to APM in 100*degrees
+extern gimbal_state_t       g_current_gimbal_state;     //gimbal angles read from APM in 100*degrees
 
 void updateGlobalPosition(int32_t lat, int32_t lon, int32_t alt, int32_t relative_alt, int16_t vx, int16_t vy, int16_t vz, uint16_t hdg);
 

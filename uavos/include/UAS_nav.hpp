@@ -10,17 +10,11 @@
 
 #include <iostream>
 #include <armadillo>
-#include <math.h>
+#include <cmath>
+#include <datasys.hpp>
 
-struct gimbal_angle
-{
-    /* data: Euler angles for Gimbal obtained from */
-    double tilt;            //Tilt angle in 100degrees
-    double pan;             //Pan angle in 100degrees
-};
-
-gimbal_angle gimbal_calculate(double u, double v, double uc, double vc, double pitch, double yaw);
 void init();
 
+gimbal_state_t gimbal_calculate(double u, double v, double uc, double vc, double pitch, double yaw);
 
 #endif /* UAS_NAV_HPP_ */
