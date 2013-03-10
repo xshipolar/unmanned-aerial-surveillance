@@ -64,8 +64,8 @@ struct gimbal
 extern attitude_t           g_attitude;
 extern global_position_t    g_global_position;
 extern system_status_t      g_system_status;
-extern gimbal               g_gimbal_input;     //Input in 100*degrees
-extern gimbal               g_gimbal_output;
+extern gimbal               g_gimbal_input;     //gimbal angles read from APM in 100*degrees
+extern gimbal               g_gimbal_output;    //gimbal angles to be sent to APM in 100*degrees
 
 void updateGlobalPosition(int32_t lat, int32_t lon, int32_t alt, int32_t relative_alt, int16_t vx, int16_t vy, int16_t vz, uint16_t hdg);
 

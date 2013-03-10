@@ -18,7 +18,7 @@ UAS_tld::UAS_tld() {
  */
 void UAS_tld::init(){
     // open the first video capture device
-    _capture_device.open(1);
+    _capture_device.open(0);
     // open the yml file containing the setting paramters and read setttings
     _parameter_file.open("../parameters.yml", FileStorage::READ);
 

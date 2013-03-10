@@ -15,7 +15,7 @@ set(CMAKE_CURRENT_BINARY_DIR ${PROJECT_SOURCE_DIR}/build)
 # general settings for all sub projects
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
-
+    
 #set the include directories
 include_directories (${PROJECT_SOURCE_DIR}/include  ${PROJECT_SOURCE_DIR}/include/UAS_tld  ${OpenCV_INCLUDE_DIRS} ${ARMADILLO_INCLUDE_DIRS})
 

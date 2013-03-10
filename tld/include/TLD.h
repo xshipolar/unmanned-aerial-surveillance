@@ -4,7 +4,7 @@
 #include <LKTracker.h>
 #include <FerNNClassifier.h>
 #include <fstream>
-#include "cv.h"
+#include <opencv2/opencv.hpp>
 #include <iostream>
 
 //Bounding Boxes
