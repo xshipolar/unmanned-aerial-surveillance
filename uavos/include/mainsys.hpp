@@ -16,8 +16,6 @@
 #include <uisys.hpp>
 #include <navsys.hpp>
 
-
 void initialize();
-
 
 #endif /* MAINSYS_HPP_ */

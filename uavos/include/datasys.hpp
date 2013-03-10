@@ -53,19 +53,21 @@ struct system_status_t {
 
 struct gimbal_state_t {
     /* data: Euler angles for Gimbal obtained from */
-    double tilt_angle;            //Gimbal Tilt angle in 100*degrees
-    double pan_angle;             //Gimbal Pan  angle in 100*degrees
-    double roll_angle;            //Gimbal Roll angle in 100*degrees
+    double tilt_angle;            //Gimbal Tilt angle in degrees
+    double pan_angle;             //Gimbal Pan  angle in degrees
+    double roll_angle;            //Gimbal Roll angle in degrees
 };
 
 // Prototypes and globals
 extern attitude_t           g_attitude;
 extern global_position_t    g_global_position;
 extern system_status_t      g_system_status;
-extern gimbal_state_t       g_current_gimbal_state;     //gimbal angles read from APM in 100*degrees
+extern gimbal_state_t       g_current_gimbal_state;     //gimbal angles read from APM in degrees
 
 void updateGlobalPosition(int32_t lat, int32_t lon, int32_t alt, int32_t relative_alt, int16_t vx, int16_t vy, int16_t vz, uint16_t hdg);
 
 void updateAttitude(float roll, float pitch, float yaw, float rollspeed, float pitchspeed, float yawspeed);
+
+void updateCurrentGimbalState(double input_pan_angle, double input_tilt_angle, double input_roll_angle);
 
 #endif /* DATASYS_HPP */

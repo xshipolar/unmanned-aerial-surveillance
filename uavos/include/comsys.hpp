@@ -11,8 +11,15 @@
 #include <UAS_comm.hpp>
 #include <UAS_serial.hpp>
 #include <mavlink/mavlink_types.h>
- 
+#include <datasys.hpp>
+
+extern UAS_comm comModule;
+
 void initComsys();
+
+// Control functions
+bool setGimbalState(double input_pan_angle, double input_tilt_angle, double input_roll_angle);
+void getGimbalState();
 
 void *runApmLink(void*);
 

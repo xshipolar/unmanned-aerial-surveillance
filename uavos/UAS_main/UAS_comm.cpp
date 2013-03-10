@@ -54,8 +54,8 @@ void UAS_comm::init(UAS_serial* serial_apm, UAS_serial* serial_gcs){
     }
 
     // assign mavlink_channels to each link
-    _chan_apm = MAVLINK_COMM_0; 
-    _chan_gcs = MAVLINK_COMM_1;
+    chan_apm = MAVLINK_COMM_0; 
+    chan_gcs = MAVLINK_COMM_1;
 }
 
 /**
@@ -80,8 +80,8 @@ void UAS_comm::init(uint32_t baudrate_apm, uint32_t baudrate_gcs){
     }
     
     // assign mavlink_channels to each link
-    _chan_apm = MAVLINK_COMM_0; 
-    _chan_gcs = MAVLINK_COMM_1;
+    chan_apm = MAVLINK_COMM_0; 
+    chan_gcs = MAVLINK_COMM_1;
 }
 
 /**
@@ -108,8 +108,8 @@ void UAS_comm::init(const char* serial_name_apm, const char* serial_name_gcs, ui
     }
 
     // assign mavlink_channels to each link
-    _chan_apm = MAVLINK_COMM_0; 
-    _chan_gcs = MAVLINK_COMM_1;
+    chan_apm = MAVLINK_COMM_0; 
+    chan_gcs = MAVLINK_COMM_1;
 }
 
 /**
@@ -122,7 +122,7 @@ void UAS_comm::updateApm(){
     unsigned char c;
 
     while(_comm_gcs->fetch(&c)>0){
-        if (mavlink_parse_char(_chan_apm, c, &msg, &status)){
+        if (mavlink_parse_char(chan_apm, c, &msg, &status)){
             parseApmMessage(&msg);
         }
     }
@@ -140,7 +140,7 @@ void UAS_comm::updateGcs(){
     unsigned char c;
 
     while(_comm_gcs->fetch(&c)>0){
-        if (mavlink_parse_char(_chan_gcs, c, &msg, &status)){
+        if (mavlink_parse_char(chan_gcs, c, &msg, &status)){
             parseGcsMessage(&msg);
         }
     }
@@ -158,10 +158,10 @@ void UAS_comm::bypassMessage(uint8_t chan, mavlink_message_t* pMsg){
     uint8_t buf[MAVLINK_MAX_PACKET_LEN]; 
     mavlink_msg_to_send_buffer(buf, pMsg);
     
-    if (chan == _chan_gcs){
+    if (chan == chan_gcs){
         _comm_gcs->send(buf,sizeof(buf)); // send bypass msg to gcs
     }
-    if (chan == _chan_apm){
+    if (chan == chan_apm){
         _comm_apm->send(buf,sizeof(buf)); // send bypass msg to apm
     }
 }
@@ -204,7 +204,7 @@ void UAS_comm::parseApmMessage(mavlink_message_t* pMsg){
 
     default:
         if (isGcsOpen()) { 
-            bypassMessage(_chan_gcs, pMsg); // pass the message to 
+            bypassMessage(chan_gcs, pMsg); // pass the message to gcs
         }
         break;
     } // end switch
@@ -224,7 +224,7 @@ void UAS_comm::parseGcsMessage(mavlink_message_t* pMsg){
 
     default:
         if (isApmOpen()) {
-            bypassMessage(_chan_apm, pMsg); // pass the msg to apm
+            bypassMessage(chan_apm, pMsg); // pass the msg to apm
         }
         break;
     } // end switch

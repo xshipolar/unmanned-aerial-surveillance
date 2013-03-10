@@ -39,27 +39,22 @@ public:
     // Updates functions to be called periodically
     void updateApm();
     void updateGcs();
-
     void parseApmMessage(mavlink_message_t* msg);
     void parseGcsMessage(mavlink_message_t* msg);
-
-    // Utility Functions 
     void bypassMessage(uint8_t chan, mavlink_message_t* msg);
-
-    void updateSensorData();
 
     // Get info function sets
     bool isApmOpen();
     bool isGcsOpen();
 
+    // mavlink communication channel 
+    uint8_t chan_apm; 
+    uint8_t chan_gcs;
+
 private:
     // pointer to communication 
     UAS_serial* _comm_apm; 
     UAS_serial* _comm_gcs;
-
-    // mavlink communication channel 
-    uint8_t _chan_apm; 
-    uint8_t _chan_gcs;
 
     uint8_t _rx_buffer_apm[MAVLINK_MAX_PACKET_LEN];
     uint8_t _rx_buffer_gcs[MAVLINK_MAX_PACKET_LEN];
@@ -71,6 +66,7 @@ private:
     bool _gcs_initialised;
 };
 
+// For mavlink conveinience functions
 #define MAVLINK_USE_CONVENIENCE_FUNCTIONS
 
 /**

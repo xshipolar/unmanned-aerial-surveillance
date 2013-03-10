@@ -10,6 +10,7 @@
 
 #include <UAS_nav.hpp>
 #include <visionsys.hpp>
+#include <comsys.hpp>
 #include <datasys.hpp>
 
 void* runNavsys(void*);

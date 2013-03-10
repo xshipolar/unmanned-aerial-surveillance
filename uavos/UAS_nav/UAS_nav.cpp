@@ -8,8 +8,8 @@ gimbal_state_t gimbal_calculate(double u, double v, double uc, double vc, double
     /* Rotation matrices */
     /* Rci = rotation matrix from {C} to Inertial fram {I} */
     /* Rec = rotation matrix  */
-    pitch*=M_PI/18000;
-    yaw*=M_PI/18000;
+    pitch*=M_PI/180;
+    yaw*=M_PI/180;
     double e_pitch, e_yaw, k1, k2, focl;
     focl = 0.4; //focal length, focl = [0.4m, 2.0m]. Changes based on zoom of camera
     k1=1.0; //gains
@@ -32,7 +32,7 @@ gimbal_state_t gimbal_calculate(double u, double v, double uc, double vc, double
 
     // Returning gimbal angles
     gimbal_state_t f;
-    f.tilt_angle = (atan2(prod(2,1), prod(2,2))*18000)/M_PI;
-    f.pan_angle = (atan2(prod(1,0), prod(0,0))*18000)/M_PI;
+    f.tilt_angle = (atan2(prod(2,1), prod(2,2))*180)/M_PI;
+    f.pan_angle = (atan2(prod(1,0), prod(0,0))*180)/M_PI;
     return f;
 }
