@@ -16,6 +16,7 @@ bool gotBB = false;
 bool drawing_box = false;
 int lot = 0;
 bool tracking_started = false;
+
 /**
  * @brief initialise vision system
  */
@@ -50,8 +51,7 @@ void* runVisionsys(void*){
                 visionModule._capture_device >> frame;
                 drawBox(frame,box);
                 imshow("TLD", frame);
-        
-                if (cvWaitKey(33) == 'q') return 0;
+                if (waitKey(33) == 27) return 0;
             }
             if (min(box.width,box.height)<(int)visionModule._parameter_file.getFirstTopLevelNode()["min_win"]){
                 cout << "Bounding box too small, try again." << endl;
@@ -70,8 +70,6 @@ void* runVisionsys(void*){
             visionModule.updateTracking();
             if (visionModule._track_status) {
                 drawBox(visionModule._current_color_frame,visionModule._target_box);
-                
-                
             }
             time_t t2=time(0);
             lot++;
@@ -83,7 +81,13 @@ void* runVisionsys(void*){
                 t1=t2;
             }
             imshow("TLD",frame);
-            if (cvWaitKey(33) == 'q') break;
+            if (waitKey(33) == 27) {
+                g_system_status.navigation_mode = NAV_MODE_IDLE; // change to IDLE mode
+                start_track = false;
+                destroyWindow("TLD");
+                cout << "Changed System State to IDLE" <<endl;
+                break;
+            }
         }
     }
 }
@@ -100,8 +104,8 @@ centroid find_centroid()
     c.y=visionModule._target_box.y+(visionModule._target_box.height)/2;
     tracking_started=true;
     return c;
-
 }
+
 void mouseHandler(int event, int x, int y, int flags, void *param){
     switch( event ){
     case CV_EVENT_MOUSEMOVE:
