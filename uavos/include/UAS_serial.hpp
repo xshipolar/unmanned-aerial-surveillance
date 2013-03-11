@@ -28,6 +28,8 @@ public:
     bool beginPort(uint32_t baudrate);
     bool beginPort(const char* serial_name, uint32_t baudrate);
     bool beginPort(const std::string serial_name, uint32_t baudrate);
+
+    void flushIO();
 /**
  * @brief fetch the next coming byte
  * @param c -- the char to be read into

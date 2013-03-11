@@ -69,10 +69,12 @@ void *runApmLink(void*){
 void *sendApmMessage(void*){
     for(;;){
         pthread_mutex_lock(&mutex_apm_send_lock);
+
         // Wait to be waken up to send data
         pthread_cond_wait(&condition_apm_send_var, &mutex_apm_send_lock);
         int len = Serial_apm.send(&apm_tx_buf, apm_tx_buf_len);
-        printf("Size written: %d / %d\n",len, apm_tx_buf_len);
+
+        //printf("Size written: %d / %d\n",len, apm_tx_buf_len);
         pthread_mutex_unlock(&mutex_apm_send_lock);
     }
 }
@@ -94,10 +96,12 @@ void *runGcsLink(void*){
 void *sendGcsMessage(void*){
     for(;;){
         pthread_mutex_lock(&mutex_gcs_send_lock);
+
         // Wait to be waken up to send data
         pthread_cond_wait(&condition_gcs_send_var, &mutex_gcs_send_lock);
+
         int len = Serial_gcs.send(&gcs_tx_buf, gcs_tx_buf_len);
-        printf("Size written: %d / %d\n",len, gcs_tx_buf_len);
+        //printf("Size written: %d / %d\n",len, gcs_tx_buf_len);
         pthread_mutex_unlock(&mutex_gcs_send_lock);
     }
 }

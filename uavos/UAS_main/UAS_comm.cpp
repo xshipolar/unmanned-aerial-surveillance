@@ -86,7 +86,7 @@ void UAS_comm::init(uint32_t baudrate_apm, uint32_t baudrate_gcs){
     } else {
         printf("Port to GCS failed to initialised at %s\n", _comm_gcs->getDeviceName());
     }
-    
+
     // assign mavlink_channels to each link
     chan_apm = MAVLINK_COMM_0; 
     chan_gcs = MAVLINK_COMM_1;
@@ -131,7 +131,7 @@ void UAS_comm::updateApm(){
 
     while(_comm_apm->fetch(&c)>0){
         if (mavlink_parse_char(chan_apm, c, &msg, &status)){
-            printf("APM: message received: %d\n",msg.msgid );
+            //printf("APM: message received: %d\n",msg.msgid );
             parseApmMessage(&msg);
         }
     }
@@ -150,7 +150,7 @@ void UAS_comm::updateGcs(){
 
     while(_comm_gcs->fetch(&c)>0){
         if (mavlink_parse_char(chan_gcs, c, &msg, &status)){
-            printf("GCS: message received: %d\n",msg.msgid );
+            //printf("GCS: message received: %d\n",msg.msgid );
             parseGcsMessage(&msg);
         }
     }

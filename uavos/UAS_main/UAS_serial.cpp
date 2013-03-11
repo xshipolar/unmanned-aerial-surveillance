@@ -72,6 +72,7 @@ bool UAS_serial::beginPort(uint32_t baudrate){
       return _port_opened;
     }
     
+    flushIO();
     _port_opened = 1;
     return _port_opened;
 }
@@ -113,6 +114,7 @@ bool UAS_serial::beginPort(const char* serial_name, uint32_t baudrate){
       return _port_opened;
     }
     
+    flushIO();
     _port_opened = 1;
     return _port_opened;
 }
@@ -154,8 +156,16 @@ bool UAS_serial::beginPort(const std::string serial_name, uint32_t baudrate){
       return _port_opened;
     }
     
+    flushIO();
     _port_opened = 1;
     return _port_opened;
+}
+
+/**
+ * @brief flush the IO buffer
+ */
+void UAS_serial::flushIO(){
+  tcflush(_serial_id, TCIOFLUSH);
 }
 
 /**
