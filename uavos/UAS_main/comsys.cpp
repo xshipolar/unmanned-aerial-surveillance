@@ -18,7 +18,7 @@ UAS_comm comModule;
 void initComsys() {
     // Opening serial ports with settings specified
     Serial_apm.beginPort("/dev/ttyACM0", 115200);
-    Serial_gcs.beginPort("/dev/ttyS0", 57600);
+    Serial_gcs.beginPort("/dev/ttyS1", 57600);
 
     mavlink_system.sysid = 255; // Set system id to 255 to match gcs
 
@@ -27,6 +27,10 @@ void initComsys() {
 
 /**
  * @brief -- send the message that control gimbal mount 
+ * @param input_pan_angle  -- pan angle to be set to gimbal mount in degs
+ * @param input_tilt_angle -- tilt angle to be set to gimbal mount in degs
+ * @param input_roll_angle -- roll angle to be set to gimbal mount in degs
+ * @return -- 1 if set successfully, 0 if port no available (failure)
  */
 bool setGimbalState(double input_pan_angle, double input_tilt_angle, double input_roll_angle) {
     if(comModule.isApmOpen()) {
@@ -52,10 +56,24 @@ void getGimbalState();
  * @brief -- thread function for running APM link
  */
 void *runApmLink(void*){
-    while(true){
-        if (comModule.isApmOpen()) {
+    // Start loop timer
+    unsigned long last_time_apm_link = getMilliSeconds();
+    for(;;){
+        if (comModule.isApmOpen()) { //&& getMilliSeconds() - last_time_apm_link > 10) { // Try to run at 100 Hz
             comModule.updateApm();
+            last_time_apm_link = getMilliSeconds();
         }
+    }
+}
+
+void *sendApmMessage(void*){
+    for(;;){
+        pthread_mutex_lock(&mutex_apm_send_lock);
+        // Wait to be waken up to send data
+        pthread_cond_wait(&condition_apm_send_var, &mutex_apm_send_lock);
+        int len = Serial_apm.send(&apm_tx_buf, apm_tx_buf_len);
+        printf("Size written: %d / %d\n",len, apm_tx_buf_len);
+        pthread_mutex_unlock(&mutex_apm_send_lock);
     }
 }
 
@@ -63,10 +81,24 @@ void *runApmLink(void*){
  * @brief -- thread function for running GCS link
  */
 void *runGcsLink(void*){
-    while(true){
-        if (comModule.isGcsOpen()) {
+    // Start loop timer
+    unsigned long last_time_gcs_link = getMilliSeconds();
+    for(;;){
+        if (comModule.isGcsOpen()) { //&& getMilliSeconds() - last_time_gcs_link > 10) { // Try to run at 100 Hz
             comModule.updateGcs();
+            last_time_gcs_link = getMilliSeconds();
         }
+    }
+}
+
+void *sendGcsMessage(void*){
+    for(;;){
+        pthread_mutex_lock(&mutex_gcs_send_lock);
+        // Wait to be waken up to send data
+        pthread_cond_wait(&condition_gcs_send_var, &mutex_gcs_send_lock);
+        int len = Serial_gcs.send(&gcs_tx_buf, gcs_tx_buf_len);
+        printf("Size written: %d / %d\n",len, gcs_tx_buf_len);
+        pthread_mutex_unlock(&mutex_gcs_send_lock);
     }
 }
 
@@ -74,9 +106,13 @@ void *runGcsLink(void*){
  * @brief --
  */
 void* runComsys(void*){
-    pthread_t thread1, thread2;
+    pthread_t thread1, thread2, thread3, thread4;
     pthread_create( &thread1, NULL, runApmLink, NULL);
     pthread_create( &thread2, NULL, runGcsLink, NULL);
+    pthread_create( &thread3, NULL, sendApmMessage, NULL);
+    pthread_create( &thread4, NULL, sendGcsMessage, NULL);
     pthread_join( thread1, NULL );
     pthread_join( thread2, NULL ); 
+    pthread_join( thread3, NULL );
+    pthread_join( thread4, NULL ); 
 }

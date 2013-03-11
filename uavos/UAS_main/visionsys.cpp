@@ -40,7 +40,7 @@ void* runVisionsys(void*){
     
     // Main loop
     while(true){
-        if (getMilliSeconds() - last_time_visionsys > 1000 && g_system_status.navigation_mode == NAV_MODE_SEMIAUTO){
+        if (getMilliSeconds() - last_time_visionsys > 1000 && g_system_status.navigation_mode >= NAV_MODE_SEMIAUTO){
             start_track = true;
             cvNamedWindow("TLD",CV_WINDOW_AUTOSIZE);
             cvSetMouseCallback( "TLD", mouseHandler, NULL );
@@ -51,7 +51,10 @@ void* runVisionsys(void*){
                 visionModule._capture_device >> frame;
                 drawBox(frame,box);
                 imshow("TLD", frame);
-                if (waitKey(33) == 27) return 0;
+                if ((char)waitKey(33) == 'q') {
+                    destroyAllWindows();
+                    return 0;
+                }
             }
             if (min(box.width,box.height)<(int)visionModule._parameter_file.getFirstTopLevelNode()["min_win"]){
                 cout << "Bounding box too small, try again." << endl;
@@ -65,7 +68,7 @@ void* runVisionsys(void*){
         }
         time_t t1=time(0);
         // Loop to update TLD tracking
-        while(start_track && g_system_status.navigation_mode == NAV_MODE_SEMIAUTO){
+        while(start_track && g_system_status.navigation_mode >= NAV_MODE_SEMIAUTO){
             tracking_started=true;
             visionModule.updateTracking();
             if (visionModule._track_status) {
@@ -81,10 +84,10 @@ void* runVisionsys(void*){
                 t1=t2;
             }
             imshow("TLD",frame);
-            if (waitKey(33) == 27) {
+            if ((char)waitKey(33) == 'q') {
                 g_system_status.navigation_mode = NAV_MODE_IDLE; // change to IDLE mode
                 start_track = false;
-                destroyWindow("TLD");
+                destroyAllWindows();
                 cout << "Changed System State to IDLE" <<endl;
                 break;
             }

@@ -12,6 +12,7 @@
 #include <UAS_serial.hpp>
 #include <mavlink/mavlink_types.h>
 #include <datasys.hpp>
+#include <utility.hpp>
 
 extern UAS_comm comModule;
 
@@ -23,7 +24,11 @@ void getGimbalState();
 
 void *runApmLink(void*);
 
+void *sendApmMessage(void*);
+
 void *runGcsLink(void*);
+
+void *sendGcsMessage(void*);
 
 void *runComsys(void*);
 

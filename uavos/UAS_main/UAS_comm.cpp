@@ -12,6 +12,14 @@
 UAS_serial Serial_apm;
 UAS_serial Serial_gcs;
 mavlink_system_t mavlink_system;
+pthread_cond_t condition_apm_send_var = PTHREAD_COND_INITIALIZER;
+pthread_cond_t condition_gcs_send_var = PTHREAD_COND_INITIALIZER;
+pthread_mutex_t mutex_apm_send_lock   = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutex_gcs_send_lock   = PTHREAD_MUTEX_INITIALIZER;
+uint8_t  apm_tx_buf[MAVLINK_MAX_PACKET_LEN]; // Mem space for holding tx buffer for apm 
+uint8_t  gcs_tx_buf[MAVLINK_MAX_PACKET_LEN]; // Mem space for holding rx buffer for gcs
+uint16_t apm_tx_buf_len = 0; // length of buffer to be written for apm
+uint16_t gcs_tx_buf_len = 0; // length of buffer to be written for gcs
 
 /**
  * @brief -- Default Constructor for comm system
@@ -121,8 +129,9 @@ void UAS_comm::updateApm(){
     mavlink_status_t status;
     unsigned char c;
 
-    while(_comm_gcs->fetch(&c)>0){
+    while(_comm_apm->fetch(&c)>0){
         if (mavlink_parse_char(chan_apm, c, &msg, &status)){
+            printf("APM: message received: %d\n",msg.msgid );
             parseApmMessage(&msg);
         }
     }
@@ -141,6 +150,7 @@ void UAS_comm::updateGcs(){
 
     while(_comm_gcs->fetch(&c)>0){
         if (mavlink_parse_char(chan_gcs, c, &msg, &status)){
+            printf("GCS: message received: %d\n",msg.msgid );
             parseGcsMessage(&msg);
         }
     }
@@ -156,13 +166,27 @@ void UAS_comm::updateGcs(){
  */
 void UAS_comm::bypassMessage(uint8_t chan, mavlink_message_t* pMsg){
     uint8_t buf[MAVLINK_MAX_PACKET_LEN]; 
-    mavlink_msg_to_send_buffer(buf, pMsg);
-    
-    if (chan == chan_gcs){
-        _comm_gcs->send(buf,sizeof(buf)); // send bypass msg to gcs
-    }
+    uint16_t len = mavlink_msg_to_send_buffer(buf, pMsg);
+
     if (chan == chan_apm){
-        _comm_apm->send(buf,sizeof(buf)); // send bypass msg to apm
+        pthread_mutex_lock(&mutex_apm_send_lock);
+        for (int i = 0; i < len; ++i)
+        {
+            apm_tx_buf[i] = buf[i];
+        }
+        apm_tx_buf_len = len;
+        pthread_cond_signal(&condition_apm_send_var);
+        pthread_mutex_unlock(&mutex_apm_send_lock);
+    }
+    if (chan == chan_gcs){
+        pthread_mutex_lock(&mutex_gcs_send_lock);
+        for (int i = 0; i < len; ++i)
+        {
+            gcs_tx_buf[i] = buf[i];
+        }
+        gcs_tx_buf_len = len;
+        pthread_cond_signal(&condition_gcs_send_var);
+        pthread_mutex_unlock(&mutex_gcs_send_lock);
     }
 }
 
@@ -176,6 +200,7 @@ void UAS_comm::parseApmMessage(mavlink_message_t* pMsg){
     case MAVLINK_MSG_ID_HEARTBEAT:
         mavlink_heartbeat_t heartbeat;
         mavlink_msg_heartbeat_decode(pMsg, &heartbeat);
+        bypassMessage(chan_gcs, pMsg);
         break;
 
     case MAVLINK_MSG_ID_ATTITUDE:
@@ -187,6 +212,7 @@ void UAS_comm::parseApmMessage(mavlink_message_t* pMsg){
                        attitude.rollspeed,
                        attitude.pitchspeed, 
                        attitude.yawspeed);
+        bypassMessage(chan_gcs, pMsg);
         break;
 
     case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
@@ -200,6 +226,7 @@ void UAS_comm::parseApmMessage(mavlink_message_t* pMsg){
                              global_position.vy, 
                              global_position.vz,  
                              global_position.hdg);
+        bypassMessage(chan_gcs, pMsg);
         break;
 
     default:
@@ -220,6 +247,7 @@ void UAS_comm::parseGcsMessage(mavlink_message_t* pMsg){
     case MAVLINK_MSG_ID_HEARTBEAT:
         mavlink_heartbeat_t heartbeat;
         mavlink_msg_heartbeat_decode(pMsg, &heartbeat);
+        bypassMessage(chan_apm, pMsg);
         break;
 
     default:

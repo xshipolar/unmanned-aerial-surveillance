@@ -22,6 +22,14 @@ using namespace std;
 extern UAS_serial Serial_apm;
 extern UAS_serial Serial_gcs;
 extern mavlink_system_t mavlink_system;
+extern pthread_cond_t condition_apm_send_var;
+extern pthread_cond_t condition_gcs_send_var;
+extern pthread_mutex_t mutex_apm_send_lock;
+extern pthread_mutex_t mutex_gcs_send_lock;
+extern uint8_t apm_tx_buf[MAVLINK_MAX_PACKET_LEN]; 
+extern uint8_t gcs_tx_buf[MAVLINK_MAX_PACKET_LEN]; 
+extern uint16_t apm_tx_buf_len;
+extern uint16_t gcs_tx_buf_len;
 
 class UAS_comm
 {
