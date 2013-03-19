@@ -16,10 +16,12 @@ add_executable(onr onr.cpp)
 add_executable(onr2 onr_systest.cpp)
 add_executable(sift_test sift_test.cpp)
 add_executable(surf_test surf_test.cpp)
+add_executable(onr3 onr_3dm.cpp)
 add_library(UAS_serial UAS_serial.cpp)
 
 # link boost_system and pthread to prevent error
 target_link_libraries(onr pthread ${OpenCV_LIBS})
 target_link_libraries(onr2 UAS_serial pthread ${OpenCV_LIBS})
+target_link_libraries(onr3 pthread ${OpenCV_LIBS})
 target_link_libraries(sift_test ${OpenCV_LIBS})
 target_link_libraries(surf_test ${OpenCV_LIBS})
