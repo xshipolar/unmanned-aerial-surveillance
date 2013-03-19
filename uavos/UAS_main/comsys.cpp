@@ -59,7 +59,7 @@ void *runApmLink(void*){
     // Start loop timer
     unsigned long last_time_apm_link = getMilliSeconds();
     for(;;){
-        if (comModule.isApmOpen()) { //&& getMilliSeconds() - last_time_apm_link > 10) { // Try to run at 100 Hz
+        if (comModule.isApmOpen()) {
             comModule.updateApm();
             last_time_apm_link = getMilliSeconds();
         }
@@ -86,7 +86,7 @@ void *runGcsLink(void*){
     // Start loop timer
     unsigned long last_time_gcs_link = getMilliSeconds();
     for(;;){
-        if (comModule.isGcsOpen()) { //&& getMilliSeconds() - last_time_gcs_link > 10) { // Try to run at 100 Hz
+        if (comModule.isGcsOpen()) {
             comModule.updateGcs();
             last_time_gcs_link = getMilliSeconds();
         }

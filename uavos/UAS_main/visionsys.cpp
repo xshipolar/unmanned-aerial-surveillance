@@ -48,15 +48,15 @@ void* runVisionsys(void*){
             GETBOUNDINGBOX:
             while(!gotBB)
             {
-                visionModule._capture_device >> frame;
+                visionModule.capture_device >> frame;
                 drawBox(frame,box);
                 imshow("TLD", frame);
-                if ((char)waitKey(33) == 'q') {
+                if ((char)waitKey(10) == 'q') {
                     destroyAllWindows();
                     return 0;
                 }
             }
-            if (min(box.width,box.height)<(int)visionModule._parameter_file.getFirstTopLevelNode()["min_win"]){
+            if (min(box.width,box.height)<(int)visionModule.parameter_file.getFirstTopLevelNode()["min_win"]){
                 cout << "Bounding box too small, try again." << endl;
                 gotBB = false;
                 goto GETBOUNDINGBOX;
@@ -72,7 +72,7 @@ void* runVisionsys(void*){
             tracking_started=true;
             visionModule.updateTracking();
             if (visionModule._track_status) {
-                drawBox(visionModule._current_color_frame,visionModule._target_box);
+                drawBox(visionModule._current_color_frame,visionModule.target_box);
             }
             time_t t2=time(0);
             lot++;
@@ -83,8 +83,8 @@ void* runVisionsys(void*){
                 lot=0;
                 t1=t2;
             }
-            imshow("TLD",frame);
-            if ((char)waitKey(33) == 'q') {
+            imshow("TLD",visionModule._current_color_frame);
+            if ((char)waitKey(10) == 'q') {
                 g_system_status.navigation_mode = NAV_MODE_IDLE; // change to IDLE mode
                 start_track = false;
                 destroyAllWindows();
@@ -103,8 +103,8 @@ void* runVisionsys(void*){
 centroid find_centroid()
 {
     centroid c;
-    c.x=visionModule._target_box.x+(visionModule._target_box.width)/2;
-    c.y=visionModule._target_box.y+(visionModule._target_box.height)/2;
+    c.x=visionModule.target_box.x+(visionModule.target_box.width)/2;
+    c.y=visionModule.target_box.y+(visionModule.target_box.height)/2;
     tracking_started=true;
     return c;
 }

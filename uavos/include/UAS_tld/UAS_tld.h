@@ -31,16 +31,16 @@ public:
 
     bool isInitialised();
 
-    VideoCapture _capture_device;
-    FileStorage  _parameter_file;
-    BoundingBox  _target_box;
+    VideoCapture capture_device;
+    FileStorage  parameter_file;
+    BoundingBox  target_box;
     vector<Point2f> _current_features;
     vector<Point2f> _previous_features;
     bool _track_status;
     Mat  _current_color_frame;
 
 private:
-    TLD          _tld_vision;
+    TLD  _tld_vision;
 
     bool _capture_device_opened;
     bool _parameter_file_opened;
