@@ -58,8 +58,6 @@
 
 #define MIP_COM_PORT_BUFFER_SIZE 0x200
 
-extern int Serial1;
-extern struct termios Serial1_setting;
 ////////////////////////////////////////////////////////////////////////////////
 //
 // Function Prototypes

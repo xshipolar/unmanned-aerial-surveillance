@@ -30,6 +30,9 @@
 #ifndef _MIP_SDK_3DM_H
 #define _MIP_SDK_3DM_H
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -206,5 +209,8 @@ u16 mip_3dm_cmd_power_state(mip_interface *device_interface, u8 function_selecto
 
 u16 mip_3dm_cmd_device_status(mip_interface *device_interface, u16 model_number, u8 status_selector, u8 *response_buffer, u16 *response_size);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif

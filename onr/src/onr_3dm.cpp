@@ -17,6 +17,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <mip_sdk.h>
 
 using namespace std;
 using namespace cv;
@@ -45,16 +46,26 @@ static unsigned long lastActiveTime = 0;
 static unsigned long lastSendTime = 0;
 
 /////////////////////////////////////////////////////////////////////
+/////////////////////// MicroStrain AHRS ////////////////////////////
+/////////////////////////////////////////////////////////////////////
+mip_interface ahrs_gx3_25;
+//Packet Counters (valid, timeout, and checksum errors)
+u32 ahrs_valid_packet_count = 0;
+u32 ahrs_timeout_packet_count = 0;
+u32 ahrs_checksum_error_packet_count = 0;
+//AHRS
+mip_ahrs_scaled_gyro  curr_ahrs_gyro;
+mip_ahrs_scaled_accel curr_ahrs_accel;
+mip_ahrs_euler_angles curr_ahrs_euler;
+
+#define DEFAULT_PACKET_TIMEOUT_MS  1000 //milliseconds
+
+/////////////////////////////////////////////////////////////////////
 ////////////////////////// Video Src ////////////////////////////////
 /////////////////////////////////////////////////////////////////////
 VideoCapture videoSrc0(0);
 const char *window1 = "Video";
 int frameCount = 0;
-   
-/////////////////////////////////////////////////////////////////////
-//////////////////////// Serial Port ////////////////////////////////
-/////////////////////////////////////////////////////////////////////
-UAS_serial Serial1("/dev/ttyACM0");
 
 /////////////////////////////////////////////////////////////////////
 ////////////////////////// Functions ////////////////////////////////
@@ -84,74 +95,70 @@ void captureVideo()
     }
 }
 
-void handleMessage()
-{
-    static unsigned char c;
-    mavlink_message_t msg;
-    mavlink_status_t status;
-    if(Serial1.fetch(&c)>0) {
-        if (mavlink_parse_char(0, c, &msg, &status)){
-            switch (msg.msgid) {
-            case MAVLINK_MSG_ID_RAW_IMU:
-                mavlink_raw_imu_t raw_imu;
-                mavlink_msg_raw_imu_decode(&msg, &raw_imu);
-                fprintf(logIMU, "%12d,%10d,%10d,%10d,%10d,%10d,%10d,\n",microSecond(),raw_imu.xacc,raw_imu.yacc,raw_imu.zacc,raw_imu.xgyro,raw_imu.ygyro,raw_imu.zgyro);
-                printf("%12d,%10d,%10d,%10d,%10d,%10d,%10d,\n",microSecond(),raw_imu.xacc,raw_imu.yacc,raw_imu.zacc,raw_imu.xgyro,raw_imu.ygyro,raw_imu.zgyro);
-                break;      
-                
-            case MAVLINK_MSG_ID_GPS_RAW_INT:
-                mavlink_gps_raw_int_t gps;
-                mavlink_msg_gps_raw_int_decode(&msg, &gps);
-                fprintf(logGPS, "%12d,%12d,%12d,%12d,%12d,%12d,%12d,%12d,%12d,%12d,\n",microSecond(), gps.lat, gps.lon, gps.alt, 
-                        gps.eph, gps.epv, gps.vel, gps.cog, gps.fix_type, gps.satellites_visible);
-                //printf("%12d,%12d,%12d,%12d,%12d,%12d,%12d,%12d,%12d,%12d,\n",microSecond(), gps.lat, gps.lon, gps.alt, 
-                //        gps.eph, gps.epv, gps.vel, gps.cog, gps.fix_type, gps.satellites_visible);
-                break;
-               
-            case MAVLINK_MSG_ID_SENSOR_OFFSETS:
-                mavlink_sensor_offsets_t sensor_offsets;
-                mavlink_msg_sensor_offsets_decode(&msg, &sensor_offsets);
-                fprintf(logSO, "%12d,%12f,%12f,%12f,%12f,%12f,%12f,\n",microSecond(),sensor_offsets.accel_cal_x, sensor_offsets.accel_cal_y, sensor_offsets.accel_cal_z, sensor_offsets.gyro_cal_x, sensor_offsets.gyro_cal_y, sensor_offsets.gyro_cal_z);
-                break;
-                
-            case MAVLINK_MSG_ID_ATTITUDE:
-                mavlink_attitude_t attitude;
-                mavlink_msg_attitude_decode(&msg, &attitude);
-                fprintf(logATT, "%12d,%12f,%12f,%12f,%12f,%12f,%12f,\n",microSecond(),attitude.roll, attitude.pitch, attitude.yaw, attitude.rollspeed, attitude.pitchspeed, attitude.yawspeed);
-                break;
-            
-            case MAVLINK_MSG_ID_AHRS:
-                mavlink_ahrs_t ahrs;
-                mavlink_msg_ahrs_decode(&msg, &ahrs);
-                fprintf(logDRIFT, "%12d,%12f,%12f,%12f,\n",microSecond(), ahrs.omegaIx, ahrs.omegaIy, ahrs.omegaIz);
-                break;
-                
-            case MAVLINK_MSG_ID_VFR_HUD:
-                mavlink_vfr_hud_t vfr;
-                mavlink_msg_vfr_hud_decode(&msg, &vfr);
-                fprintf(logALT, "%12d,%12f,\n",microSecond(), vfr.alt);
-                break;
-                
-            case MAVLINK_MSG_ID_HEARTBEAT:
-                mavlink_heartbeat_t heartbeat;
-                mavlink_msg_heartbeat_decode(&msg, &heartbeat);
-                if (heartbeat.system_status == MAV_STATE_ACTIVE){
-                    active = true;
-                    lastActiveTime = microSecond();
-                    printf("APM is active \n");
-                } else if (heartbeat.system_status == MAV_STATE_CALIBRATING) {
-                    printf("APM is initialising \n");
-                    active = false;
-                }
-                break;
-            
-            default:
-                break;
-            }   
-        }
-    }
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//                                  Print Packet Statistics                                      //
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void print_packet_stats() {
+    //printf("%u AHRS (%u errors)\n", ahrs_valid_packet_count, ahrs_timeout_packet_count + ahrs_checksum_error_packet_count);
+    printf("%10d, %10.3f,%10.3f,%10.3f,%10.3f,%10.3f,%10.3f\n", microSecond(), curr_ahrs_accel.scaled_accel[0], curr_ahrs_accel.scaled_accel[1], curr_ahrs_accel.scaled_accel[2],
+                                                          curr_ahrs_gyro.scaled_gyro[0], curr_ahrs_gyro.scaled_gyro[1], curr_ahrs_gyro.scaled_gyro[2]);
+    printf("%10d,%10.3f,%10.3f,%10.3f\n", microSecond(), curr_ahrs_euler.roll, curr_ahrs_euler.pitch, curr_ahrs_euler.yaw);
+    fprintf(logIMU, "%10d,%10.3f,%10.3f,%10.3f,%10.3f,%10.3f,%10.3f\n", microSecond(), curr_ahrs_accel.scaled_accel[0], curr_ahrs_accel.scaled_accel[1], curr_ahrs_accel.scaled_accel[2],
+                                                          curr_ahrs_gyro.scaled_gyro[0], curr_ahrs_gyro.scaled_gyro[1], curr_ahrs_gyro.scaled_gyro[2]);
+    fprintf(logATT, "%10d,%10.3f,%10.3f,%10.3f\n", microSecond(), curr_ahrs_euler.roll, curr_ahrs_euler.pitch, curr_ahrs_euler.yaw);
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//                                  AHRS Packet Callback                                         //
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void ahrs_packet_callback(void *user_ptr, u8 *packet, u16 packet_size, u8 callback_type) {
+    mip_field_header *field_header;
+    u8               *field_data;
+    u16              field_offset = 0;
+
+    //The packet callback can have several types, process them all
+    switch(callback_type) {
+    case MIP_INTERFACE_CALLBACK_VALID_PACKET:
+        ahrs_valid_packet_count++;
+        while(mip_get_next_field(packet, &field_header, &field_data, &field_offset) == MIP_OK) {
+            switch(field_header->descriptor) {
+
+            case MIP_AHRS_DATA_ACCEL_SCALED:
+                memcpy(&curr_ahrs_accel, field_data, sizeof(mip_ahrs_scaled_accel));
+                mip_ahrs_scaled_accel_byteswap(&curr_ahrs_accel);
+            break;
+
+            case MIP_AHRS_DATA_GYRO_SCALED:
+                memcpy(&curr_ahrs_gyro, field_data, sizeof(mip_ahrs_scaled_gyro));
+                mip_ahrs_scaled_gyro_byteswap(&curr_ahrs_gyro);
+            break;
+
+            case MIP_AHRS_DATA_EULER_ANGLES:
+                memcpy(&curr_ahrs_euler, field_data, sizeof(mip_ahrs_euler_angles));
+                mip_ahrs_euler_angles_byteswap(&curr_ahrs_euler);
+
+            default: break;
+            }
+        } 
+    break;
+
+    case MIP_INTERFACE_CALLBACK_CHECKSUM_ERROR:
+        ahrs_checksum_error_packet_count++;
+    break;
+
+    case MIP_INTERFACE_CALLBACK_TIMEOUT:
+        ahrs_timeout_packet_count++;
+    break;
+
+    default: 
+    break;
+    }
+    print_packet_stats();
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//                                  Video Capture Thread                                         //
+///////////////////////////////////////////////////////////////////////////////////////////////////
 void *runThread1(void*)
 {
     pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
@@ -164,6 +171,7 @@ void *runThread1(void*)
         {
             pthread_mutex_lock( &mutex1 );
             alive=false;
+            mip_base_cmd_idle(&ahrs_gx3_25); // idling AHRS device
             pthread_mutex_unlock( &mutex1 );
         }
 #endif
@@ -171,28 +179,14 @@ void *runThread1(void*)
 }
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//                                  AHRS Handling Thread                                         //
+///////////////////////////////////////////////////////////////////////////////////////////////////
 void *runThread2(void*)
 {
     while(alive)
     {
-        handleMessage();
-        if (microSecond() - lastActiveTime > 1500000) active = false;
-    }
-}
-
-void *runThread3(void*)
-{
-    bool setStream = true;
-    while(alive)
-    {
-        if (active && setStream) {
-            sendMessage(MAVLINK_MSG_ID_REQUEST_DATA_STREAM);
-            setStream = false;
-        }
-        if (microSecond() - lastSendTime > 1000000) {
-            sendMessage(MAVLINK_MSG_ID_HEARTBEAT);
-            lastSendTime = microSecond();
-        }
+        mip_interface_update(&ahrs_gx3_25);
     }
 }
 
@@ -244,9 +238,49 @@ int main()
     numTime = getNumTime(&rawTime);
     printf ( "The current local time is: %s \n", ctime(&rawTime) );
     
-    // Serial through termios
-    Serial1.beginPort(115200);
-    
+    // Initialize AHRS
+    if (mip_interface_init(0, 115200, &ahrs_gx3_25, DEFAULT_PACKET_TIMEOUT_MS) != MIP_INTERFACE_OK) {
+        printf("Failed to initialize AHRS \n");
+        return -1;
+    } else {
+        printf("Port to IMU is open \n");
+    }
+
+    // Set callback
+    if(mip_interface_add_descriptor_set_callback(&ahrs_gx3_25, MIP_AHRS_DATA_SET, NULL, &ahrs_packet_callback) != MIP_INTERFACE_OK) {
+        printf("Failed to register callback\n");
+        return -1;
+    } else {
+        printf("Registered callback function succesfully\n");
+    }
+
+    // Setup AHRS
+    u8 enable = 1;
+    u16 ahrs_rate = 0;
+    mip_3dm_cmd_continuous_data_stream(&ahrs_gx3_25, MIP_FUNCTION_SELECTOR_WRITE, MIP_3DM_AHRS_DATASTREAM, &enable);
+    mip_3dm_cmd_get_ahrs_base_rate(&ahrs_gx3_25, &ahrs_rate);
+    printf("Rate of AHRS message is: %d\n", ahrs_rate);
+
+    // Setup the AHRS message format and verify via read-back
+    u8  data_stream_format_descriptors[10] = {0};
+    u16 data_stream_format_decimation[10]  = {0};
+    u8  data_stream_format_num_entries     =  0;
+    printf("\n\nSetting the AHRS datastream format....\n\n");
+
+    data_stream_format_descriptors[0] = MIP_AHRS_DATA_ACCEL_SCALED; 
+    data_stream_format_descriptors[1] = MIP_AHRS_DATA_GYRO_SCALED; 
+    data_stream_format_descriptors[2] = MIP_AHRS_DATA_EULER_ANGLES;
+
+    data_stream_format_decimation[0]  = 0x0A; 
+    data_stream_format_decimation[1]  = 0x0A; 
+    data_stream_format_decimation[2]  = 0x0A; 
+
+    data_stream_format_num_entries = 3;
+ 
+    //Set the message format
+    mip_3dm_cmd_ahrs_message_format(&ahrs_gx3_25, MIP_FUNCTION_SELECTOR_WRITE, &data_stream_format_num_entries, 
+                                       data_stream_format_descriptors, data_stream_format_decimation);
+
     // Video Display
 #if DISPLAY == ENABLED
     namedWindow(window1,CV_WINDOW_AUTOSIZE);
@@ -277,18 +311,15 @@ int main()
     logIMU   = fopen(imuPath.c_str(), "w");
     logFrame = fopen(framePath.c_str(),"w");
     logATT   = fopen(attPath.c_str(),"w");
-    fprintf(logIMU,  "     time(us)   xacc(mg)   yacc(mg)   zacc(mg)      xgyro      ygyro      zgyro\n");
-    fprintf(logATT,  "     time(us)    roll(rad)   pitch(rad)     yaw(rad)      rollspd     pitchspd       yawspd (rad/s)\n");
-
+    fprintf(logIMU,  "     time(us)    xacc(g)    yacc(g)    zacc(g)      xgyro      ygyro      zgyro\n");
+    fprintf(logATT,  "     time(us)    roll(rad)   pitch(rad)     yaw(rad)\n");
     // Mainloop
     pthread_t thread1, thread2, thread3;
 
     pthread_create( &thread1, NULL, runThread1, NULL);
     pthread_create( &thread2, NULL, runThread2, NULL);
-    pthread_create( &thread3, NULL, runThread3, NULL);
     pthread_join( thread1, NULL );
     pthread_join( thread2, NULL );
-    pthread_join( thread3, NULL );
 
     return 0;
 }

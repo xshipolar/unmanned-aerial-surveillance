@@ -59,6 +59,9 @@
 //!
 //
 /////////////////////////////////////////////////////////////////////////////
+static int Serial1;
+static struct termios Serial1_setting;
+
 int mapBaudRate(uint32_t baudrate, int* baudrate_termios){
   switch(baudrate){
       case      50 : *baudrate_termios = B50;
@@ -253,10 +256,10 @@ u16 mip_sdk_port_read(void *port_handle, u8 *buffer, u32 num_bytes, u32 *bytes_r
     *bytes_read = 0;
 
     *bytes_read = read( *((int*) port_handle), buffer, num_bytes);
-    if (*bytes_read <= 0) {
-        return MIP_USER_FUNCTION_ERROR;
-    } else {
+    if (*bytes_read > 0) {
         return MIP_USER_FUNCTION_OK;
+    } else {
+        return MIP_USER_FUNCTION_ERROR;
     }
 }
 

@@ -20,5 +20,5 @@ add_library(ring_buffer        ring_buffer.c)
 add_library(byteswap_utilities byteswap_utilities.c)
 
 # set macro
-set(MIP_SDK_LIBS mip_sdk_gps     mip_sdk_ahrs  mip_sdk_3dm       mip_sdk_base    byteswap_utilities
-                 mip_sdk_system  mip_sdk_nav   mip_sdk_interface mip ring_buffer mip_sdk_user_functions PARENT_SCOPE)
+set(MIP_SDK_LIBS mip_sdk_gps     mip_sdk_ahrs  mip_sdk_3dm       mip_sdk_base        
+                 mip_sdk_system  mip_sdk_nav   mip_sdk_interface mip          mip_sdk_user_functions ring_buffer byteswap_utilities PARENT_SCOPE)
