@@ -7,7 +7,9 @@
  */
  
 #include "UAS_serial.hpp"
-
+#include <string>
+#include <cstdio>
+#include <cstring>
 /**
  * @brief -- default constructor of UAS_serial class
  */
@@ -166,6 +168,16 @@ bool UAS_serial::beginPort(const std::string serial_name, uint32_t baudrate){
  */
 void UAS_serial::flushIO(){
   tcflush(_serial_id, TCIOFLUSH);
+}
+
+/**
+ * @brief get available bytes
+ * @return -- avaiable bytes on input buffer
+ */
+int UAS_serial::avaiable(){
+  int avaiable_bytes;
+  ioctl(_serial_id, FIONREAD, &avaiable_bytes);
+  return avaiable_bytes;
 }
 
 /**

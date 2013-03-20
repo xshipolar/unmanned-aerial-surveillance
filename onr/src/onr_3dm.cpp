@@ -18,8 +18,6 @@
 #include <unistd.h>
 #include <pthread.h>
 
-#include "UAS_serial.hpp"
-
 using namespace std;
 using namespace cv;
 /////////////////////////////////////////////////////////////////////
@@ -33,12 +31,8 @@ using namespace cv;
 /////////////////////////// Data Log ////////////////////////////////
 /////////////////////////////////////////////////////////////////////
 FILE *logIMU;
-FILE *logGPS;
 FILE *logFrame;
-FILE *logSO;
 FILE *logATT;
-FILE *logDRIFT;
-FILE *logALT;
 string mainPath = "../test_data/";
 
 /////////////////////////////////////////////////////////////////////
@@ -46,7 +40,6 @@ string mainPath = "../test_data/";
 /////////////////////////////////////////////////////////////////////
 bool alive = true;
 bool active = false;
-uint8_t buf[MAVLINK_MAX_PACKET_LEN];
 static unsigned long startTime = 0;
 static unsigned long lastActiveTime = 0;
 static unsigned long lastSendTime = 0;

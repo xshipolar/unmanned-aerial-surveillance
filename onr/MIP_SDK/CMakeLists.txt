@@ -5,16 +5,17 @@ project(MIP_SDK)
 include_directories(${PROJECT_SOURCE_DIR}/../include)
 
 # add libraries
-add_library(mip                mip.c)
-add_library(mip_sdk_3dm        mip_sdk_3dm.c)
-add_library(mip_sdk_ahrs       mip_sdk_ahrs.c)
-add_library(mip_sdk_base       mip_sdk_base.c)
-add_library(mip_sdk_gps        mip_sdk_gps.c)
-add_library(mip_sdk_interface  mip_sdk_interface.c)
-add_library(mip_sdk_nav        mip_sdk_nav.c)
-add_library(mip_sdk_system     mip_sdk_system.c)
-add_library(ring_buffer        ring_buffer.c)
+add_library(mip                mip.cxx)
+add_library(mip_sdk_3dm        mip_sdk_3dm.cxx)
+add_library(mip_sdk_ahrs       mip_sdk_ahrs.cxx)
+add_library(mip_sdk_base       mip_sdk_base.cxx)
+add_library(mip_sdk_gps        mip_sdk_gps.cxx)
+add_library(mip_sdk_interface  mip_sdk_interface.cxx)
+add_library(mip_sdk_nav        mip_sdk_nav.cxx)
+add_library(mip_sdk_system     mip_sdk_system.cxx)
+add_library(ring_buffer        ring_buffer.cxx)
+add_library(byteswap_utilities byteswap_utilities.cxx)
 
 # set macro
-set{MIP_SDK_LIBS mip_sdk_gps     mip_sdk_ahrs  mip_sdk_3dm       mip_sdk_base 
-                 mip_sdk_system  mip_sdk_nav   mip_sdk_interface mip ring_buffer PARENT_SCOPE}
+set(MIP_SDK_LIBS mip_sdk_gps     mip_sdk_ahrs  mip_sdk_3dm       mip_sdk_base    byteswap_utilities
+                 mip_sdk_system  mip_sdk_nav   mip_sdk_interface mip ring_buffer PARENT_SCOPE)

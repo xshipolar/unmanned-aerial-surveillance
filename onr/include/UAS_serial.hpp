@@ -10,12 +10,9 @@
 #define UAS_SERIAL_HPP_
 
 #include <termios.h>
-#include <cstdio>
-#include <cstring>
 #include <inttypes.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <string>
 
 class UAS_serial {
 public:
@@ -30,15 +27,16 @@ public:
     bool beginPort(const std::string serial_name, uint32_t baudrate);
 
     void flushIO();
+    int available();
 /**
  * @brief fetch the next coming byte
  * @param c -- the char to be read into
  * @return length of the packet (bytes)
  */
     template <class serial_buffer>
-    int fetch(serial_buffer* c){
+    int fetch(serial_buffer* rx_buffer, size_t count){
         int len;
-        len = read(_serial_id, c, 1);
+        len = read(_serial_id, rx_buffer, count);
         return len;
     }
 

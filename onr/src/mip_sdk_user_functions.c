@@ -32,7 +32,7 @@
 
 
 #include "mip_sdk_user_functions.h"
-#include <windows.h>
+//#include <windows.h>
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -60,10 +60,22 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-u16 mip_sdk_port_open(void **port_handle, int port_num, int baudrate)
-{
- //User must replace this code
- return MIP_USER_FUNCTION_ERROR; 
+u16 mip_sdk_port_open(void **port_handle, int port_num, int baudrate) {
+    // Get device name
+    std::string port_name;
+    ostringstream convert;
+    convert << port_num;
+    port_name = "/dev/ttyACM" + convert.str();
+
+    // Begin port with device name and baudrate 
+    bool port_opened = Serial1.beginPort(port_name, baudrate);
+
+    if (port_opened) {
+        *port_handle = &Serial1;
+        return MIP_USER_FUNCTION_OK;
+    } else {
+        return MIP_USER_FUNCTION_ERROR;
+    }
 }
 
 
@@ -90,10 +102,9 @@ u16 mip_sdk_port_open(void **port_handle, int port_num, int baudrate)
 //
 /////////////////////////////////////////////////////////////////////////////
 
-u16 mip_sdk_port_close(void *port_handle)
-{
- //User must replace this code
- return MIP_USER_FUNCTION_ERROR; 
+u16 mip_sdk_port_close(void *port_handle) {
+    port_handle->closePort();
+    return MIP_USER_FUNCTION_OK; 
 }
 
 
@@ -124,10 +135,13 @@ u16 mip_sdk_port_close(void *port_handle)
 //
 /////////////////////////////////////////////////////////////////////////////
 
-u16 mip_sdk_port_write(void *port_handle, u8 *buffer, u32 num_bytes, u32 *bytes_written, u32 timeout_ms)
-{
- //User must replace this code
- return MIP_USER_FUNCTION_ERROR;
+u16 mip_sdk_port_write(void *port_handle, u8 *buffer, u32 num_bytes, u32 *bytes_written, u32 timeout_ms) {
+    *bytes_written = port_handle->send(buffer, num_bytes);
+    if (*bytes_written > 0){
+        return MIP_USER_FUNCTION_OK;
+    } else {
+        return MIP_USER_FUNCTION_ERROR;
+    }
 }
 
 
@@ -158,10 +172,13 @@ u16 mip_sdk_port_write(void *port_handle, u8 *buffer, u32 num_bytes, u32 *bytes_
 //
 /////////////////////////////////////////////////////////////////////////////
 
-u16 mip_sdk_port_read(void *port_handle, u8 *buffer, u32 num_bytes, u32 *bytes_read, u32 timeout_ms)
-{
- //User must replace this code
- return MIP_USER_FUNCTION_ERROR;
+u16 mip_sdk_port_read(void *port_handle, u8 *buffer, u32 num_bytes, u32 *bytes_read, u32 timeout_ms) {
+    *bytes_read = port_handle->fetch(buffer, num_bytes);
+    if (*bytes_read <= 0) {
+        return MIP_USER_FUNCTION_OK;
+    } else {
+        return MIP_USER_FUNCTION_ERROR;
+    }
 }
 
 
@@ -188,10 +205,8 @@ u16 mip_sdk_port_read(void *port_handle, u8 *buffer, u32 num_bytes, u32 *bytes_r
 //
 /////////////////////////////////////////////////////////////////////////////
 
-u32 mip_sdk_port_read_count(void *port_handle)
-{
- //User must replace this code
- return 0;
+u32 mip_sdk_port_read_count(void *port_handle) {
+    return port_handle->available();
 }
 
 
@@ -222,8 +237,9 @@ u32 mip_sdk_port_read_count(void *port_handle)
 //
 /////////////////////////////////////////////////////////////////////////////
 
-u32 mip_sdk_get_time_ms()
-{
- //User must replace this code
- return 0; 
+u32 mip_sdk_get_time_ms(){
+    timeval currentTime;
+    gettimeofday(&currentTime, NULL);
+    unsigned long usec = currentTime.tv_sec * 1000 + currentTime.tv_usec/1000;
+    return usec;
 }
