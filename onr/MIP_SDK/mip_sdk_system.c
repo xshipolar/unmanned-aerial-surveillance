@@ -99,7 +99,7 @@ u16 mip_system_com_mode(mip_interface *device_interface, u8 function_selector, u
  //Copy the data to the provided buffer on success if present
  if((return_code == MIP_INTERFACE_OK) && (response_data != NULL))
  {
-  field_header_ptr = response_data;
+  field_header_ptr = (mip_field_header*) response_data;
   
   if((field_header_ptr->descriptor == MIP_SYSTEM_REPLY_COM_MODE) &&
      (field_header_ptr->size >= sizeof(mip_field_header) + sizeof(u8)))

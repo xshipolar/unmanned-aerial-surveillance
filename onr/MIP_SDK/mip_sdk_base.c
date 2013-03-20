@@ -135,7 +135,7 @@ u16 mip_base_cmd_get_device_info(mip_interface *device_interface, base_device_in
  //Copy the data to the provided buffer on success
  if(return_code == MIP_INTERFACE_OK)
  {
-  field_header_ptr = response_data;
+  field_header_ptr = (mip_field_header*) response_data;
   
   if((field_header_ptr->descriptor == MIP_REPLY_DESC_BASE_DEVICE_INFO) &&
      (field_header_ptr->size >= sizeof(mip_field_header) + sizeof(base_device_info_field)))
@@ -203,7 +203,7 @@ u16 mip_base_cmd_get_device_supported_descriptors(mip_interface *device_interfac
  //Copy the data to the provided buffer on success if present
  if((return_code == MIP_INTERFACE_OK) && (response_data != NULL))
  {
-  field_header_ptr = response_data;
+  field_header_ptr = (mip_field_header*) response_data;
   
   if((field_header_ptr->size - sizeof(mip_field_header)) <= user_buffer_size)
   {
@@ -268,7 +268,7 @@ u16 mip_base_cmd_built_in_test(mip_interface *device_interface, u32 *bit_result)
  //Copy the data to the provided buffer on success
  if(return_code == MIP_INTERFACE_OK)
  {
-  field_header_ptr = response_data;
+  field_header_ptr = (mip_field_header*) response_data;
   
   if((field_header_ptr->descriptor == MIP_REPLY_DESC_BASE_BUILT_IN_TEST) &&
      (field_header_ptr->size >= sizeof(mip_field_header) + sizeof(u32)))

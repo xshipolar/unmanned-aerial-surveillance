@@ -684,7 +684,7 @@ u16 mip_nav_set_init_attitude(mip_interface *device_interface, float euler_angle
 
 
  return mip_interface_send_command(device_interface, MIP_NAV_COMMAND_SET, MIP_NAV_CMD_SET_INITIAL_ATTITUDE, 
-                                   local_angles, sizeof(float)*3, 1, MIP_INTERFACE_DEFAULT_COMMAND_RESPONSE_TIMEOUT_MS);
+                                   (u8*)local_angles, sizeof(float)*3, 1, MIP_INTERFACE_DEFAULT_COMMAND_RESPONSE_TIMEOUT_MS);
 }
 
 
@@ -728,7 +728,7 @@ u16 mip_nav_set_init_heading(mip_interface *device_interface, float heading)
 
 
  return mip_interface_send_command(device_interface, MIP_NAV_COMMAND_SET, MIP_NAV_CMD_SET_INITIAL_HEADING, 
-                                   &local_heading, sizeof(float), 1, MIP_INTERFACE_DEFAULT_COMMAND_RESPONSE_TIMEOUT_MS);
+                                   (u8*) &local_heading, sizeof(float), 1, MIP_INTERFACE_DEFAULT_COMMAND_RESPONSE_TIMEOUT_MS);
 }
 
 
@@ -773,7 +773,7 @@ u16 mip_nav_set_init_attitude_from_ahrs(mip_interface *device_interface, float d
 
 
  return mip_interface_send_command(device_interface, MIP_NAV_COMMAND_SET, MIP_NAV_CMD_SET_INITIAL_HEADING_FROM_AHRS, 
-                                   &local_declination, sizeof(float), 1, MIP_INTERFACE_DEFAULT_COMMAND_RESPONSE_TIMEOUT_MS);
+                                   (u8*) &local_declination, sizeof(float), 1, MIP_INTERFACE_DEFAULT_COMMAND_RESPONSE_TIMEOUT_MS);
 
 }
 
@@ -838,7 +838,7 @@ u16 mip_nav_vehicle_dynamics_mode(mip_interface *device_interface, u8 function_s
  //Copy the data to the provided buffer on success if present
  if((return_code == MIP_INTERFACE_OK) && (response_data != NULL))
  {
-  field_header_ptr = response_data;
+  field_header_ptr = (mip_field_header*) response_data;
   
   if((field_header_ptr->descriptor == MIP_NAV_REPLY_VEHICLE_DYNAMICS_MODE) &&
      (field_header_ptr->size >= sizeof(mip_field_header) + sizeof(u8)))
@@ -906,7 +906,7 @@ u16 mip_nav_sensor2vehicle_tranformation(mip_interface *device_interface, u8 fun
  
  if(function_selector == MIP_FUNCTION_SELECTOR_WRITE)
  {
-  float_ptr = &command_data[1];
+  float_ptr = (float*) &command_data[1];
 
   //Copy the angles to a local buffer
   memcpy(float_ptr, euler_angles, sizeof(float)*3);
@@ -928,7 +928,7 @@ u16 mip_nav_sensor2vehicle_tranformation(mip_interface *device_interface, u8 fun
  //Copy the data to the provided buffer on success if present
  if((return_code == MIP_INTERFACE_OK) && (response_data != NULL))
  {
-  field_header_ptr = response_data;
+  field_header_ptr = (mip_field_header*) response_data;
   
   if((field_header_ptr->descriptor == MIP_NAV_REPLY_SENSOR2VEHICLE_TRANSFORMATION) &&
      (field_header_ptr->size >= sizeof(mip_field_header) + sizeof(float)*3))
@@ -1002,7 +1002,7 @@ u16 mip_nav_sensor2vehicle_offset(mip_interface *device_interface, u8 function_s
  
  if(function_selector == MIP_FUNCTION_SELECTOR_WRITE)
  {
-  float_ptr = &command_data[1];
+  float_ptr = (float*) &command_data[1];
   
   //Copy the angles to a local buffer
   memcpy(float_ptr, offset, sizeof(float)*3);
@@ -1023,7 +1023,7 @@ u16 mip_nav_sensor2vehicle_offset(mip_interface *device_interface, u8 function_s
  //Copy the data to the provided buffer on success if present
  if((return_code == MIP_INTERFACE_OK) && (response_data != NULL))
  {
-  field_header_ptr = response_data;
+  field_header_ptr = (mip_field_header*) response_data;
   
   if((field_header_ptr->descriptor == MIP_NAV_REPLY_SENSOR2VEHICLE_OFFSET) &&
      (field_header_ptr->size >= sizeof(mip_field_header) + sizeof(float)*3))
@@ -1097,7 +1097,7 @@ u16 mip_nav_antenna_offset(mip_interface *device_interface, u8 function_selector
 
  if(function_selector == MIP_FUNCTION_SELECTOR_WRITE)
  {
-  float_ptr       = &command_data[1];
+  float_ptr       = (float*) &command_data[1];
  
   //Copy the angles to a local buffer
   memcpy(float_ptr, offset, sizeof(float)*3);
@@ -1116,7 +1116,7 @@ u16 mip_nav_antenna_offset(mip_interface *device_interface, u8 function_selector
  //Copy the data to the provided buffer on success if present
  if((return_code == MIP_INTERFACE_OK) && (response_data != NULL))
  {
-  field_header_ptr = response_data;
+  field_header_ptr = (mip_field_header*) response_data;
   
   if((field_header_ptr->descriptor == MIP_NAV_REPLY_ANTENNA_OFFSET) &&
      (field_header_ptr->size >= sizeof(mip_field_header) + sizeof(float)*3))
@@ -1189,7 +1189,7 @@ u16 mip_nav_bias_estimation(mip_interface *device_interface, u8 function_selecto
 
  if(function_selector == MIP_FUNCTION_SELECTOR_WRITE)
  {
-  short_ptr       = &command_data[1];
+  short_ptr       = (u16*) &command_data[1];
   *short_ptr      = *bias_control;
 
   //Byteswap the bias control value if enabled
@@ -1205,7 +1205,7 @@ u16 mip_nav_bias_estimation(mip_interface *device_interface, u8 function_selecto
  //Copy the data to the provided buffer on success if present
  if((return_code == MIP_INTERFACE_OK) && (response_data != NULL))
  {
-  field_header_ptr = response_data;
+  field_header_ptr = (mip_field_header*) response_data;
   
   if((field_header_ptr->descriptor == MIP_NAV_REPLY_BIAS_ESTIMATION_CONTROL) &&
      (field_header_ptr->size >= sizeof(mip_field_header) + sizeof(u8)))
@@ -1286,7 +1286,7 @@ u16 mip_nav_gps_source(mip_interface *device_interface, u8 function_selector, u8
  //Copy the data to the provided buffer on success if present
  if((return_code == MIP_INTERFACE_OK) && (response_data != NULL))
  {
-  field_header_ptr = response_data;
+  field_header_ptr = (mip_field_header*) response_data;
   
   if((field_header_ptr->descriptor == MIP_NAV_REPLY_GPS_SOURCE_CONTROL) &&
      (field_header_ptr->size >= sizeof(mip_field_header) + sizeof(u8)))
@@ -1350,7 +1350,7 @@ u16 mip_nav_external_gps_update(mip_interface *device_interface, mip_nav_externa
  }   
  
  return mip_interface_send_command(device_interface, MIP_NAV_COMMAND_SET, MIP_NAV_CMD_EXTERNAL_GPS_UPDATE, 
-                                   &local_command, sizeof(mip_nav_external_gps_update_command), 1, MIP_INTERFACE_DEFAULT_COMMAND_RESPONSE_TIMEOUT_MS);
+                                   (u8*) &local_command, sizeof(mip_nav_external_gps_update_command), 1, MIP_INTERFACE_DEFAULT_COMMAND_RESPONSE_TIMEOUT_MS);
 }
 
 
@@ -1396,7 +1396,7 @@ u16 mip_nav_external_heading_update(mip_interface *device_interface, mip_nav_ext
  
 
  return mip_interface_send_command(device_interface, MIP_NAV_COMMAND_SET, MIP_NAV_CMD_EXTERNAL_HEADING_UPDATE, 
-                                   &local_command, sizeof(mip_nav_external_heading_update_command), 1, MIP_INTERFACE_DEFAULT_COMMAND_RESPONSE_TIMEOUT_MS);
+                                   (u8*) &local_command, sizeof(mip_nav_external_heading_update_command), 1, MIP_INTERFACE_DEFAULT_COMMAND_RESPONSE_TIMEOUT_MS);
 }
 
 
@@ -1460,7 +1460,7 @@ u16 mip_nav_heading_source(mip_interface *device_interface, u8 function_selector
  //Copy the data to the provided buffer on success if present
  if((return_code == MIP_INTERFACE_OK) && (response_data != NULL))
  {
-  field_header_ptr = response_data;
+  field_header_ptr = (mip_field_header*) response_data;
   
   if((field_header_ptr->descriptor == MIP_NAV_REPLY_HEADING_UPDATE_CONTROL) &&
      (field_header_ptr->size >= sizeof(mip_field_header) + sizeof(u8)))
@@ -1535,7 +1535,7 @@ u16 mip_nav_auto_initialization(mip_interface *device_interface, u8 function_sel
  //Copy the data to the provided buffer on success if present
  if((return_code == MIP_INTERFACE_OK) && (response_data != NULL))
  {
-  field_header_ptr = response_data;
+  field_header_ptr = (mip_field_header*) response_data;
   
   if((field_header_ptr->descriptor == MIP_NAV_REPLY_AUTOINIT_CONTROL) &&
      (field_header_ptr->size >= sizeof(mip_field_header) + sizeof(u8)))
@@ -1605,7 +1605,7 @@ u16 mip_nav_accel_white_noise(mip_interface *device_interface, u8 function_selec
  
  if(function_selector == MIP_FUNCTION_SELECTOR_WRITE)
  {
-  float_ptr       = &command_data[1];
+  float_ptr       = (float*) &command_data[1];
  
   //Copy the angles to a local buffer
   memcpy(float_ptr, noise_1sigma, sizeof(float)*3);
@@ -1625,7 +1625,7 @@ u16 mip_nav_accel_white_noise(mip_interface *device_interface, u8 function_selec
  //Copy the data to the provided buffer on success if present
  if((return_code == MIP_INTERFACE_OK) && (response_data != NULL))
  {
-  field_header_ptr = response_data;
+  field_header_ptr = (mip_field_header*) response_data;
   
   if((field_header_ptr->descriptor == MIP_NAV_REPLY_ACCEL_NOISE) &&
      (field_header_ptr->size >= sizeof(mip_field_header) + sizeof(float)*3))
@@ -1702,7 +1702,7 @@ u16 mip_nav_gyro_white_noise(mip_interface *device_interface, u8 function_select
  
  if(function_selector == MIP_FUNCTION_SELECTOR_WRITE)
  {
-  float_ptr       = &command_data[1];
+  float_ptr       = (float*) &command_data[1];
  
   //Copy the angles to a local buffer
   memcpy(float_ptr, noise_1sigma, sizeof(float)*3);
@@ -1721,7 +1721,7 @@ u16 mip_nav_gyro_white_noise(mip_interface *device_interface, u8 function_select
  //Copy the data to the provided buffer on success if present
  if((return_code == MIP_INTERFACE_OK) && (response_data != NULL))
  {
-  field_header_ptr = response_data;
+  field_header_ptr = (mip_field_header*) response_data;
   
   if((field_header_ptr->descriptor == MIP_NAV_REPLY_GYRO_NOISE) &&
      (field_header_ptr->size >= sizeof(mip_field_header) + sizeof(float)*3))
@@ -1801,7 +1801,7 @@ u16 mip_nav_gyro_bias_model(mip_interface *device_interface, u8 function_selecto
  
  if(function_selector == MIP_FUNCTION_SELECTOR_WRITE)
  {
-  float_ptr       = &command_data[1];
+  float_ptr       = (float*) &command_data[1];
   
   //Copy the parameters to a local buffer
   memcpy(float_ptr,   bias_beta,         sizeof(float)*3);
@@ -1821,7 +1821,7 @@ u16 mip_nav_gyro_bias_model(mip_interface *device_interface, u8 function_selecto
  //Copy the data to the provided buffer on success if present
  if((return_code == MIP_INTERFACE_OK) && (response_data != NULL))
  {
-  field_header_ptr = response_data;
+  field_header_ptr = (mip_field_header*) response_data;
   
   if((field_header_ptr->descriptor == MIP_NAV_REPLY_GYRO_BIAS_MODEL) &&
      (field_header_ptr->size >= sizeof(mip_field_header) + sizeof(float)*6))

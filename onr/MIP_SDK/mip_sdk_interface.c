@@ -746,7 +746,7 @@ void __mip_interface_command_response_handler(void *user_ptr, u8 *packet, u16 pa
   
   if(mip_get_next_field(packet, &field_header_ptr, &field_data_ptr, &field_offset) == MIP_OK)
   { 
-   device_interface->command_response_data      = field_header_ptr;
+   device_interface->command_response_data      = (u8*) field_header_ptr;
    device_interface->command_response_data_size = payload_size - sizeof(global_ack_nack_field);
   }
  }

@@ -30,10 +30,6 @@
 #ifndef _MIP_SDK_USER_FUNCTIONS_H
 #define _MIP_SDK_USER_FUNCTIONS_H
 
-#ifdef __cplusplus
- extern "C" {
-#endif
-
 ////////////////////////////////////////////////////////////////////////////////
 //
 //Include Files
@@ -41,10 +37,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "mip.h"
-#include <UAS_serial.hpp>
-#include <cstring>
-#include <string>
-#include <sstream>
+#include <string.h>
+#include <stdio.h>
+#include <termios.h>
+#include <inttypes.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
+#include <sys/time.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -58,7 +58,8 @@
 
 #define MIP_COM_PORT_BUFFER_SIZE 0x200
 
-extern UAS_serial Serial1;
+extern int Serial1;
+extern struct termios Serial1_setting;
 ////////////////////////////////////////////////////////////////////////////////
 //
 // Function Prototypes
@@ -75,9 +76,5 @@ u16 mip_sdk_port_read(void *port_handle, u8 *buffer, u32 num_bytes, u32 *bytes_r
 u32 mip_sdk_port_read_count(void *port_handle);
 
 u32 mip_sdk_get_time_ms();
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

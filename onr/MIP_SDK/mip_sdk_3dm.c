@@ -264,7 +264,7 @@ u16 mip_3dm_cmd_get_ahrs_base_rate(mip_interface *device_interface, u16 *base_ra
  //Copy the data to the provided buffer on success
  if(return_code == MIP_INTERFACE_OK)
  {
-  field_header_ptr = response_data;
+  field_header_ptr = (mip_field_header* )response_data;
   
   if((field_header_ptr->descriptor == MIP_3DM_REPLY_AHRS_BASE_RATE) &&
      (field_header_ptr->size >= sizeof(mip_field_header) + sizeof(u16)))
@@ -322,7 +322,7 @@ u16 mip_3dm_cmd_get_gps_base_rate(mip_interface *device_interface, u16 *base_rat
  //Copy the data to the provided buffer on success
  if(return_code == MIP_INTERFACE_OK)
  {
-  field_header_ptr = response_data;
+  field_header_ptr = (mip_field_header*) response_data;
   
   if((field_header_ptr->descriptor == MIP_3DM_REPLY_GPS_BASE_RATE) &&
      (field_header_ptr->size >= sizeof(mip_field_header) + sizeof(u16)))
@@ -379,7 +379,7 @@ u16 mip_3dm_cmd_get_nav_base_rate(mip_interface *device_interface, u16 *base_rat
  //Copy the data to the provided buffer on success
  if(return_code == MIP_INTERFACE_OK)
  {
-  field_header_ptr = response_data;
+  field_header_ptr = (mip_field_header*) response_data;
   
   if((field_header_ptr->descriptor == MIP_3DM_REPLY_NAV_BASE_RATE) &&
      (field_header_ptr->size >= sizeof(mip_field_header) + sizeof(u16)))
@@ -488,7 +488,7 @@ u16 mip_3dm_cmd_ahrs_message_format(mip_interface *device_interface, u8 function
  //Copy the data to the provided buffer on success if present
  if((return_code == MIP_INTERFACE_OK) && (response_data != NULL))
  {
-  field_header_ptr = response_data;
+  field_header_ptr = (mip_field_header*) response_data;
   
   //Must have at least the number of entries in the message format to continue
   if((field_header_ptr->descriptor == MIP_3DM_REPLY_AHRS_MESSAGE_FORMAT) &&
@@ -618,7 +618,7 @@ u16 mip_3dm_cmd_gps_message_format(mip_interface *device_interface, u8 function_
  //Copy the data to the provided buffer on success if present
  if((return_code == MIP_INTERFACE_OK) && (response_data != NULL))
  {
-  field_header_ptr = response_data;
+  field_header_ptr = (mip_field_header*) response_data;
   
   //Must have at least the number of entries in the message format to continue
   if((field_header_ptr->descriptor == MIP_3DM_REPLY_GPS_MESSAGE_FORMAT) &&
@@ -748,7 +748,7 @@ u16 mip_3dm_cmd_nav_message_format(mip_interface *device_interface, u8 function_
  //Copy the data to the provided buffer on success if present
  if((return_code == MIP_INTERFACE_OK) && (response_data != NULL))
  {
-  field_header_ptr = response_data;
+  field_header_ptr = (mip_field_header*) response_data;
   
   //Must have at least the number of entries in the message format to continue
   if((field_header_ptr->descriptor == MIP_3DM_REPLY_NAV_MESSAGE_FORMAT) &&
@@ -860,7 +860,7 @@ u16 mip_3dm_cmd_continuous_data_stream(mip_interface *device_interface, u8 funct
  //Copy the data to the provided buffer on success if present
  if((return_code == MIP_INTERFACE_OK) && (response_data != NULL))
  {
-  field_header_ptr = response_data;
+  field_header_ptr = (mip_field_header*) response_data;
   
   if((field_header_ptr->descriptor == MIP_3DM_REPLY_DATASTREAM_ENABLE) &&
      (field_header_ptr->size >= sizeof(mip_field_header) + sizeof(u8)*2))
@@ -945,7 +945,7 @@ u16 mip_3dm_cmd_gps_dynamics_mode(mip_interface *device_interface, u8 function_s
  //Copy the data to the provided buffer on success if present
  if((return_code == MIP_INTERFACE_OK) && (response_data != NULL))
  {
-  field_header_ptr = response_data;
+  field_header_ptr = (mip_field_header*) response_data;
   
   if((field_header_ptr->descriptor == MIP_3DM_REPLY_GPS_DYNAMICS_MODE) &&
      (field_header_ptr->size >= sizeof(mip_field_header) + sizeof(u8)))
@@ -1072,7 +1072,7 @@ u16 mip_3dm_cmd_ahrs_signal_conditioning(mip_interface *device_interface, u8 fun
  //Copy the data to the provided buffer on success if present
  if((return_code == MIP_INTERFACE_OK) && (response_data != NULL))
  {
-  field_header_ptr = response_data;
+  field_header_ptr = (mip_field_header*) response_data;
   
   if((field_header_ptr->descriptor == MIP_3DM_REPLY_AHRS_SIGNAL_SETTINGS) &&
      (field_header_ptr->size >= sizeof(mip_field_header) + sizeof(mip_ahrs_signal_settings)))
@@ -1163,7 +1163,7 @@ u16 mip_3dm_cmd_ahrs_timestamp(mip_interface *device_interface, u8 function_sele
  //Copy the data to the provided buffer on success if present
  if((return_code == MIP_INTERFACE_OK) && (response_data != NULL))
  {
-  field_header_ptr = response_data;
+  field_header_ptr = (mip_field_header*) response_data;
   
   if((field_header_ptr->descriptor == MIP_3DM_REPLY_AHRS_TIMESTAMP_VALUE) &&
      (field_header_ptr->size >= sizeof(mip_field_header) + sizeof(u8) + sizeof(u32)))
@@ -1288,7 +1288,7 @@ u16 mip_3dm_cmd_uart_baudrate(mip_interface *device_interface, u8 function_selec
  //Copy the data to the provided buffer on success if present
  if((return_code == MIP_INTERFACE_OK) && (response_data != NULL))
  {
-  field_header_ptr = response_data;
+  field_header_ptr = (mip_field_header*) response_data;
   
   if((field_header_ptr->descriptor == MIP_3DM_REPLY_UART_BAUDRATE) &&
      (field_header_ptr->size >= sizeof(mip_field_header) + sizeof(u32)))
@@ -1380,7 +1380,7 @@ u16 mip_3dm_cmd_datastream_format(mip_interface *device_interface, u8 function_s
  //Copy the data to the provided buffer on success if present
  if((return_code == MIP_INTERFACE_OK) && (response_data != NULL))
  {
-  field_header_ptr = response_data;
+  field_header_ptr = (mip_field_header*) response_data;
   
   if((field_header_ptr->descriptor == MIP_3DM_REPLY_DATASTREAM_FORMAT) &&
      (field_header_ptr->size >= sizeof(mip_field_header) + sizeof(u8)*2))
@@ -1469,7 +1469,7 @@ u16 mip_3dm_cmd_power_state(mip_interface *device_interface, u8 function_selecto
  //Copy the data to the provided buffer on success if present
  if((return_code == MIP_INTERFACE_OK) && (response_data != NULL))
  {
-  field_header_ptr = response_data;
+  field_header_ptr = (mip_field_header*) response_data;
   
   if((field_header_ptr->descriptor == MIP_3DM_REPLY_POWER_STATE) &&
      (field_header_ptr->size >= sizeof(mip_field_header) + sizeof(u8)*2))
@@ -1549,7 +1549,7 @@ u16 mip_3dm_cmd_device_status(mip_interface *device_interface, u16 model_number,
  //Copy the data to the provided buffer on success if present
  if((return_code == MIP_INTERFACE_OK) && (response_data != NULL))
  {
-  field_header_ptr = response_data;
+  field_header_ptr = (mip_field_header*) response_data;
   
   if((field_header_ptr->size - sizeof(mip_field_header)) <= user_buffer_size)
   {
