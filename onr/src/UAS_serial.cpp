@@ -9,15 +9,38 @@
 #include "UAS_serial.hpp"
 
 /**
- * @brief constructor of UAS_serial class
+ * @brief -- default constructor of UAS_serial class
  */
-UAS_serial::UAS_serial(const char* serial_name){
-    _device_name = serial_name;
+UAS_serial::UAS_serial(){
+    // Initialise status data to false
+    _port_opened = 0;
+    _serial_id = -1;
 }
 
 /**
- * @brief initializer for port
+ * @brief -- constructor of UAS_serial class with serial name defined
+ */
+UAS_serial::UAS_serial(const char* serial_name){
+    _device_name = serial_name;
+    // Initialise status data to false
+    _port_opened = 0;
+    _serial_id = -1;
+}
+
+/**
+ * @brief -- constructor of UAS_serial class with serial name defined
+ */
+UAS_serial::UAS_serial(const std::string serial_name){
+    _device_name = serial_name.c_str();
+    // Initialise status data to false
+    _port_opened = 0;
+    _serial_id = -1;
+}
+
+/**
+ * @brief initializer for port, provided that device name is defined
  * @param baud_rate -- bits-per-sec for the I/O
+ * @return -- 1 for success 0 for failure
  */
 bool UAS_serial::beginPort(uint32_t baudrate){
     int baudr;
@@ -29,7 +52,8 @@ bool UAS_serial::beginPort(uint32_t baudrate){
     if(_serial_id == -1){
       perror("unable to open comport ");
       _error = -1;
-      return 1;
+      _port_opened = 0;
+      return _port_opened;
     }
 
     memset(&_port_settings, 0, sizeof(_port_settings));  // setting memory for port
@@ -44,16 +68,111 @@ bool UAS_serial::beginPort(uint32_t baudrate){
     if(_error==-1){
       close(_serial_id);
       perror("unable to adjust portsettings ");
-      return 1;
+      _port_opened = 0;
+      return _port_opened;
     }
     
-    return 0;
+    flushIO();
+    _port_opened = 1;
+    return _port_opened;
+}
+
+/**
+ * @brief initializer for port, provided that device name is defined
+ * @param serial_name -- name of the serial device to be opened
+ * @param baud_rate -- bits-per-sec for the I/O
+ * @return -- 1 for success 0 for failure
+ */
+bool UAS_serial::beginPort(const char* serial_name, uint32_t baudrate){
+    int baudr;
+    _baudrate = baudrate;
+    _device_name = serial_name;
+    
+    mapBaudRate(_baudrate, &baudr); // map baudrate to termios B-- style
+
+    _serial_id = open(_device_name, O_RDWR | O_NOCTTY | O_NONBLOCK);
+    if(_serial_id == -1){
+      perror("unable to open comport ");
+      _error = -1;
+      _port_opened = 0;
+      return _port_opened;
+    }
+
+    memset(&_port_settings, 0, sizeof(_port_settings));  // setting memory for port
+    _port_settings.c_cflag = baudr | CS8 | CLOCAL | CREAD;
+    _port_settings.c_iflag = 0;
+    _port_settings.c_oflag = 0;
+    _port_settings.c_lflag = 0;
+    _port_settings.c_cc[VMIN] = 0;      /* block untill n bytes are received */
+    _port_settings.c_cc[VTIME] = 0;     /* block untill a timer expires (n * 100 mSec.) */
+    _error = tcsetattr(_serial_id, TCSANOW, &_port_settings);
+    
+    if(_error==-1){
+      close(_serial_id);
+      perror("unable to adjust portsettings ");
+      _port_opened = 0;
+      return _port_opened;
+    }
+    
+    flushIO();
+    _port_opened = 1;
+    return _port_opened;
+}
+
+/**
+ * @brief initializer for port, provided that device name is defined
+ * @param serial_name -- name of the serial device to be opened
+ * @param baud_rate -- bits-per-sec for the I/O
+ * @return -- 1 for success 0 for failure
+ */
+bool UAS_serial::beginPort(const std::string serial_name, uint32_t baudrate){
+    int baudr;
+    _baudrate = baudrate;
+    _device_name = serial_name.c_str();
+    
+    mapBaudRate(_baudrate, &baudr); // map baudrate to termios B-- style
+
+    _serial_id = open(_device_name, O_RDWR | O_NOCTTY | O_NONBLOCK);
+    if(_serial_id == -1){
+      perror("unable to open comport ");
+      _error = -1;
+      _port_opened = 0;
+      return _port_opened;
+    }
+
+    memset(&_port_settings, 0, sizeof(_port_settings));  // setting memory for port
+    _port_settings.c_cflag = baudr | CS8 | CLOCAL | CREAD;
+    _port_settings.c_iflag = 0;
+    _port_settings.c_oflag = 0;
+    _port_settings.c_lflag = 0;
+    _port_settings.c_cc[VMIN] = 0;      /* block untill n bytes are received */
+    _port_settings.c_cc[VTIME] = 0;     /* block untill a timer expires (n * 100 mSec.) */
+    _error = tcsetattr(_serial_id, TCSANOW, &_port_settings);
+    
+    if(_error==-1){
+      close(_serial_id);
+      perror("unable to adjust portsettings ");
+      _port_opened = 0;
+      return _port_opened;
+    }
+    
+    flushIO();
+    _port_opened = 1;
+    return _port_opened;
+}
+
+/**
+ * @brief flush the IO buffer
+ */
+void UAS_serial::flushIO(){
+  tcflush(_serial_id, TCIOFLUSH);
 }
 
 /**
  * @brief close the serial port
  */
 void UAS_serial::closePort(){
+  _port_opened = 0;
   close(_serial_id);
 }
 
@@ -61,8 +180,16 @@ void UAS_serial::closePort(){
  * @brief get the name of the port
  * @return -- string of the name of the port
  */
-const char* UAS_serial::getDeviceName() {
+const char* UAS_serial::getDeviceName(){
   return _device_name;
+}
+
+/**
+ * @brief get the open status of the port
+ * @return -- _port_opened
+ */
+bool UAS_serial::isOpened(){
+  return _port_opened;
 }
 
 /**

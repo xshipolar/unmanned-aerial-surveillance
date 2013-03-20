@@ -15,11 +15,21 @@
 #include <inttypes.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <string>
 
 class UAS_serial {
 public:
+    // Constructors
+    UAS_serial();
     UAS_serial(const char* serial_name);
+    UAS_serial(const std::string serial_name);
+
+    // Initialiser
     bool beginPort(uint32_t baudrate);
+    bool beginPort(const char* serial_name, uint32_t baudrate);
+    bool beginPort(const std::string serial_name, uint32_t baudrate);
+
+    void flushIO();
 /**
  * @brief fetch the next coming byte
  * @param c -- the char to be read into
@@ -48,6 +58,7 @@ public:
 
     // Get info functions
     const char* getDeviceName();
+    bool isOpened();
     
 private:
     bool mapBaudRate(uint32_t baudrate, int* baudrate_termios);
@@ -55,8 +66,10 @@ private:
     const char* _device_name;
     int8_t      _serial_id;
     uint32_t    _baudrate;
-    int8_t     _error;
+    int8_t      _error;
     termios     _port_settings;
+
+    bool _port_opened; // status of the port
 };
 
 #endif
