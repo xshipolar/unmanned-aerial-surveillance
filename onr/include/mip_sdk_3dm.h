@@ -30,10 +30,6 @@
 #ifndef _MIP_SDK_3DM_H
 #define _MIP_SDK_3DM_H
 
-#ifdef __cplusplus
- extern "C" {
-#endif
-
 ////////////////////////////////////////////////////////////////////////////////
 //
 //Include Files
@@ -208,9 +204,5 @@ u16 mip_3dm_cmd_datastream_format(mip_interface *device_interface, u8 function_s
 u16 mip_3dm_cmd_power_state(mip_interface *device_interface, u8 function_selector, u8 device_selector, u8 *power_state);
 
 u16 mip_3dm_cmd_device_status(mip_interface *device_interface, u16 model_number, u8 status_selector, u8 *response_buffer, u16 *response_size);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

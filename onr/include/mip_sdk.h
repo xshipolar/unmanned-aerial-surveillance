@@ -30,10 +30,6 @@
 #ifndef _MIP_SDK_H
 #define _MIP_SDK_H
 
-#ifdef __cplusplus
- extern "C" {
-#endif
-
 ////////////////////////////////////////////////////////////////////////////////
 //
 //Include Files
@@ -50,10 +46,5 @@
 #include "mip_sdk_ahrs.h"
 #include "mip_sdk_gps.h"
 #include "mip_sdk_nav.h"
-
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

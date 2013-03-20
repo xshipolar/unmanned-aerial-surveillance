@@ -17,7 +17,10 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <pthread.h>
-#include <mip_sdk.h>
+ 
+extern "C" {
+    #include <mip_sdk.h>
+}
 
 using namespace std;
 using namespace cv;
@@ -100,12 +103,12 @@ void captureVideo()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void print_packet_stats() {
     //printf("%u AHRS (%u errors)\n", ahrs_valid_packet_count, ahrs_timeout_packet_count + ahrs_checksum_error_packet_count);
-    printf("%10d, %10.3f,%10.3f,%10.3f,%10.3f,%10.3f,%10.3f\n", microSecond(), curr_ahrs_accel.scaled_accel[0], curr_ahrs_accel.scaled_accel[1], curr_ahrs_accel.scaled_accel[2],
+    printf("%12d, %10.5f,%10.5f,%10.5f,%10.5f,%10.5f,%10.5f\n", microSecond(), curr_ahrs_accel.scaled_accel[0], curr_ahrs_accel.scaled_accel[1], curr_ahrs_accel.scaled_accel[2],
                                                           curr_ahrs_gyro.scaled_gyro[0], curr_ahrs_gyro.scaled_gyro[1], curr_ahrs_gyro.scaled_gyro[2]);
-    printf("%10d,%10.3f,%10.3f,%10.3f\n", microSecond(), curr_ahrs_euler.roll, curr_ahrs_euler.pitch, curr_ahrs_euler.yaw);
-    fprintf(logIMU, "%10d,%10.3f,%10.3f,%10.3f,%10.3f,%10.3f,%10.3f\n", microSecond(), curr_ahrs_accel.scaled_accel[0], curr_ahrs_accel.scaled_accel[1], curr_ahrs_accel.scaled_accel[2],
+    printf("%12d,%10.5f,%10.5f,%10.5f\n", microSecond(), curr_ahrs_euler.roll, curr_ahrs_euler.pitch, curr_ahrs_euler.yaw);
+    fprintf(logIMU, "%12d,%10.5f,%10.5f,%10.5f,%10.5f,%10.5f,%10.5f\n", microSecond(), curr_ahrs_accel.scaled_accel[0], curr_ahrs_accel.scaled_accel[1], curr_ahrs_accel.scaled_accel[2],
                                                           curr_ahrs_gyro.scaled_gyro[0], curr_ahrs_gyro.scaled_gyro[1], curr_ahrs_gyro.scaled_gyro[2]);
-    fprintf(logATT, "%10d,%10.3f,%10.3f,%10.3f\n", microSecond(), curr_ahrs_euler.roll, curr_ahrs_euler.pitch, curr_ahrs_euler.yaw);
+    fprintf(logATT, "%12d,%10.5f,%10.5f,%10.5f\n", microSecond(), curr_ahrs_euler.roll, curr_ahrs_euler.pitch, curr_ahrs_euler.yaw);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
