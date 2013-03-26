@@ -17,7 +17,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <pthread.h>
- 
+
 extern "C" {
     #include <mip_sdk.h>
 }
@@ -43,7 +43,7 @@ string mainPath = "../test_data/";
 ///////////////////////// System Status /////////////////////////////
 /////////////////////////////////////////////////////////////////////
 bool alive = true;
-bool active = false;
+bool active = true;
 static unsigned long startTime = 0;
 static unsigned long lastActiveTime = 0;
 static unsigned long lastSendTime = 0;
@@ -274,9 +274,9 @@ int main()
     data_stream_format_descriptors[1] = MIP_AHRS_DATA_GYRO_SCALED; 
     data_stream_format_descriptors[2] = MIP_AHRS_DATA_EULER_ANGLES;
 
-    data_stream_format_decimation[0]  = 0x0A; 
-    data_stream_format_decimation[1]  = 0x0A; 
-    data_stream_format_decimation[2]  = 0x0A; 
+    data_stream_format_decimation[0]  = 0x02; 
+    data_stream_format_decimation[1]  = 0x02; 
+    data_stream_format_decimation[2]  = 0x02; 
 
     data_stream_format_num_entries = 3;
  
