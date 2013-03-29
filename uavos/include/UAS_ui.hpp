@@ -42,6 +42,8 @@ class UAS_ui
 	int remove_state(string rem);
 	int change_state_val(string name,mode new_val);
 	mode poll_state(string poll);
+	void print_tree();
+	void print_tree(ui_struct* ptr);
 	ui_struct* head;
 
 	private:

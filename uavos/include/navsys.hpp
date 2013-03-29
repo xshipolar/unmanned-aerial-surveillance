@@ -8,7 +8,7 @@
 #ifndef NAVSYS_HPP_
 #define NAVSYS_HPP_
 
-#include <UAS_nav.hpp>
+#include <UAS_nav/UAS_nav.hpp>
 #include <visionsys.hpp>
 #include <comsys.hpp>
 #include <datasys.hpp>

@@ -7,7 +7,9 @@
 #include <UAS_ui.hpp>
 #include <string>
 #include <stdlib.h>
-//using namespace std;
+#include <stdio.h>
+#include <iostream>
+using namespace std;
 /* init_ui()
  *	Description : Initialize ui
  *	Inputs : none
@@ -19,12 +21,13 @@ UAS_ui::UAS_ui() {
 }
 void UAS_ui::init_ui()
 {
-	head=new_state("MAIN","",ON);		//Initializes head to MAIN and turns mode ON
+	UAS_ui::head=new_state("","MAIN",ON);		//Initializes head to MAIN and turns mode ON
+	cout<<"Head initialized to :"<<UAS_ui::head->name<<"\n";
 }
 
 bool UAS_ui::isInitialized()
 {
-	if(head==NULL)					//Checking to see if the head is initialized
+	if(UAS_ui::head==NULL)					//Checking to see if the head is initialized
 	return false;
 	return true;
 }
@@ -36,15 +39,33 @@ bool UAS_ui::isInitialized()
  */	
 void UAS_ui::load_ui()
 {
-	add_state("MAIN","READ DATA",OFF);				//MAIN->NAVIGATION(OM)
-	add_state("MAIN","CHECK STATE",OFF);					//MAIN->VISION(ON)
-	add_state("MAIN","CHANGE STATE",OFF);			//MAIN->COMMUNICATION(ON)
-	add_state("READ_STATE","GPS",OFF);				//MAIN->NAVIGATION->AUTO(OFF)
-	add_state("READ_STATE","IMU",OFF);			//MAIN->NAVIGATION->MANUAL(ON)
-	add_state("READ_STATE","CAMERA_ANGLE",OFF);
+	int n;
+	n=add_state("MAIN","READ DATA",OFF);				//MAIN->NAVIGATION(OM)
+	if(n==-1)
+	cout<<"Adding read failed\n";
+	n=add_state("MAIN","CHECK STATE",OFF);					//MAIN->VISION(ON)
+	if(n==-1)
+	cout<<"Adding check state failed\n";
+	n=add_state("MAIN","CHANGE STATE",OFF);			//MAIN->COMMUNICATION(ON)
+	if(n==-1)
+	cout<<"Adding change state failed\n";
+	n=add_state("MAIN","EXIT",OFF);
+	if(n==-1)
+	cout<<"Adding Exit state failed\n";
+	n=add_state("READ DATA","GPS",OFF);				//MAIN->NAVIGATION->AUTO(OFF)
+	if(n==-1)
+	cout<<"Adding GPS failed\n";
+	n=add_state("READ DATA","IMU",OFF);			//MAIN->NAVIGATION->MANUAL(ON)
+	if(n==-1)
+	cout<<"Adding IMU failed\n";
+	n=add_state("READ DATA","CAMERA ANGLE",OFF);
+	if(n==-1)
+	cout<<"Adding CAMERA_ANGLE failed\n";
 	//add_state("CHANGE STATE","AUTO",OFF);
 	//add_state("CHANGE STATE","SEMI-AUTO",OFF);
 	//add_state("CHANGE STATE","MANUAL",OFF);
+	cout<<"Printing tree->>>\n";
+	print_tree();
 }
 /* new_state()
  *	Description : Load ui with a sample state diagram
@@ -65,6 +86,7 @@ ui_struct* UAS_ui::new_state(string state_head,string state_name,mode value)
 	ptr->nodes[i]=new ui_struct;
 
 	ptr->no_of_nodes=0;
+	return ptr;
 
 }
 /*  find_state()
@@ -77,7 +99,7 @@ ui_struct* UAS_ui::new_state(string state_head,string state_name,mode value)
 ui_struct* UAS_ui::find_state(ui_struct* current,string key)
 {
 	if(current==NULL)					//End of state diagram reached!
-		return NULL;					//Search unsuccessful in sub-tree
+	return NULL;					//Search unsuccessful in sub-tree
 	ui_struct* ret;
 	if(current->name==key)				//Search successful!
 	return current;
@@ -101,7 +123,6 @@ int UAS_ui::add_state(string add,string state_name,mode val)
 	if(ptr==NULL)
 	return -1;		//Error in finding name
 	ui_struct* new_ptr=new_state(add,state_name,val);
-	if(ptr->no_of_nodes==0)
 	ptr->nodes[ptr->no_of_nodes]=new_ptr;
 	ptr->no_of_nodes++;
 	return 0;	
@@ -151,7 +172,10 @@ int UAS_ui::change_state_val(string name,mode new_val)
 	ui_struct* ptr;
 	ptr=find_state(head,name);					//Searching for state in state diagram
 	if(ptr==NULL)
-	return -1;
+	{
+		cout<<"State : "<<name<<" not found!\n";
+		return -1;
+	}
 	ptr->val=new_val;							//Mode changed
 	return 0;
 }
@@ -168,4 +192,23 @@ mode UAS_ui::poll_state(string poll)
 	if(ptr==NULL)
 	return NOT_DEFINED;					//Error
 	return ptr->val;
+}
+
+void UAS_ui::print_tree(ui_struct* ptr)
+{
+	int i;
+	if(ptr==NULL)
+	return;
+	cout<<ptr->name;
+	printf("->(");
+	for(i=0;i<ptr->no_of_nodes;i++)
+	print_tree(ptr->nodes[i]);
+	printf(")");
+	
+}
+
+void UAS_ui::print_tree()
+{
+	print_tree(UAS_ui::head);
+	printf("\n");
 }

@@ -17,12 +17,6 @@ void initUisys();
 
 void* runUisys(void*);
 
-bool read_flag=false;
 
-bool set_state_flag=false;
-
-bool check_state_flag=false;
-
-bool exit_flag=false;
 
 #endif /* UISYS_HPP_ */
