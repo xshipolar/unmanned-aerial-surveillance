@@ -8,12 +8,13 @@
 
 using namespace std;
 static UAS_ui uiModule;
+static struct termios initial_settings, new_settings;
+static int peek_character = -1;
 
- void initUisys()
- {
+void initUisys()
+{
  	uiModule.init_ui();
- }
-
+}
 void* runUisys(void*)
 {
 	if(uiModule.isInitialized())
@@ -23,19 +24,20 @@ void* runUisys(void*)
     }
     else
     cout<<"Module not initialized!!\n";
-	while(true){
+    while(true){
     if(uiModule.poll_state("READ DATA")==ON)
     {
+        nodelay(stdscr, TRUE);
         cout<<"Reading State\n";
-        /*char ch;
-        cin>>ch;
-        if(ch=='q')                       //Resetting the ui on pressing Esc
+        if(kbhit()==1)
         {
-           uiModule.change_state_val("GPS",OFF);
-           uiModule.change_state_val("IMU",OFF);
-           uiModule.change_state_val("CAMERA ANGLE",OFF);
-           uiModule.change_state_val("READ DATA",OFF);
-        }*/
+            //cout<<"Keyboard interrupt received\n";
+            close_keyboard();
+            uiModule.change_state_val("GPS",OFF);
+            uiModule.change_state_val("IMU",OFF);
+            uiModule.change_state_val("CAMERA ANGLE",OFF);
+            uiModule.change_state_val("READ DATA",OFF);
+        }
         if(uiModule.poll_state("GPS")==ON)
         //Print GPS Coordinates
         if(uiModule.poll_state("IMU")==ON)
@@ -139,7 +141,10 @@ void* runUisys(void*)
 
             }
             if(read_flag==true)
-            break;
+            {
+                init_keyboard();
+                break;
+            }
             }
            	break;
             }
@@ -151,6 +156,7 @@ void* runUisys(void*)
             break;
         	case '4':
         	uiModule.change_state_val("EXIT",ON);
+            close_keyboard();
           	break;
         	default:
         	cout<<"Error in selection!!\n";
@@ -162,4 +168,42 @@ void* runUisys(void*)
 	}
     	}
 }
- 
+
+//changing terminal keyboard input definitions for the time read_keyboard is called 
+void init_keyboard()
+{
+    tcgetattr(0,&initial_settings);
+    new_settings = initial_settings;
+    new_settings.c_lflag &= ~ICANON;
+    new_settings.c_lflag &= ~ECHO;
+    new_settings.c_lflag &= ~ISIG;
+    new_settings.c_cc[VMIN] = 1;
+    new_settings.c_cc[VTIME] = 0;
+    tcsetattr(0, TCSANOW, &new_settings);
+}
+//resetting it back to the original settings
+void close_keyboard()
+{
+    tcsetattr(0, TCSANOW, &initial_settings);
+}
+
+//defined my own version of kbhit...
+int kbhit()
+{
+    char ch;
+    int nread;
+
+    if(peek_character != -1)
+        return 1;
+    new_settings.c_cc[VMIN]=0;
+    tcsetattr(0, TCSANOW, &new_settings);
+    nread = read(0,&ch,1);
+    new_settings.c_cc[VMIN]=1;
+    tcsetattr(0, TCSANOW, &new_settings);
+
+    if(nread == 1) {
+        peek_character = ch;
+        return 1;
+    }
+    return 0;
+}
