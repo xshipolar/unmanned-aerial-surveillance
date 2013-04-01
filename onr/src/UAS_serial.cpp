@@ -174,10 +174,10 @@ void UAS_serial::flushIO(){
  * @brief get available bytes
  * @return -- avaiable bytes on input buffer
  */
-int UAS_serial::avaiable(){
-  int avaiable_bytes;
-  ioctl(_serial_id, FIONREAD, &avaiable_bytes);
-  return avaiable_bytes;
+int UAS_serial::available(){
+  int available_bytes;
+  ioctl(_serial_id, FIONREAD, &available_bytes);
+  return available_bytes;
 }
 
 /**

@@ -288,9 +288,9 @@ u16 mip_sdk_port_read(void *port_handle, u8 *buffer, u32 num_bytes, u32 *bytes_r
 /////////////////////////////////////////////////////////////////////////////
 
 u32 mip_sdk_port_read_count(void *port_handle) {
-    u32 avaiable_bytes = 0;
-    ioctl(*((int*)port_handle), TIOCINQ, &avaiable_bytes);
-    return avaiable_bytes;
+    u32 available = 0;
+    ioctl(*((int*)port_handle), TIOCINQ, &available);
+    return available;
 }
 
 
