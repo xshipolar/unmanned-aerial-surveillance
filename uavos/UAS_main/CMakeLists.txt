@@ -17,6 +17,6 @@ add_executable(mainsys mainsys.cpp)
 
 # link 
 target_link_libraries(mainsys comsys UAS_comm UAS_serial pthread uisys UAS_ui datasys navsys visionsys UAS_nav utility 
-                      ${UAS_nav_LIBS} ${UAS_tld_LIBS} ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES})
+                      ${UAS_nav_LIBS} ${UAS_tld_LIBS} ${CURSES_LIBRARIES} ${OpenCV_LIBS} ${ARMADILLO_LIBRARIES})
 
 set(CMAKE_BUILD_TYPE Release)
