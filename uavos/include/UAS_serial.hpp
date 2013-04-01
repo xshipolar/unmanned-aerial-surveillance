@@ -14,6 +14,7 @@
 #include <cstring>
 #include <inttypes.h>
 #include <fcntl.h>
+#include <sys/ioctl.h>
 #include <unistd.h>
 #include <string>
 
@@ -30,6 +31,8 @@ public:
     bool beginPort(const std::string serial_name, uint32_t baudrate);
 
     void flushIO();
+    int getIncomingBytes();
+    int getOutgoingBytes();
 /**
  * @brief fetch the next coming byte
  * @param c -- the char to be read into

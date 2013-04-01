@@ -62,7 +62,7 @@ bool UAS_serial::beginPort(uint32_t baudrate){
     _port_settings.c_oflag = 0;
     _port_settings.c_lflag = 0;
     _port_settings.c_cc[VMIN] = 0;      /* block untill n bytes are received */
-    _port_settings.c_cc[VTIME] = 0;     /* block untill a timer expires (n * 100 mSec.) */
+    _port_settings.c_cc[VTIME] = 1;     /* block untill a timer expires (n * 100 mSec.) */
     _error = tcsetattr(_serial_id, TCSANOW, &_port_settings);
     
     if(_error==-1){
@@ -166,6 +166,26 @@ bool UAS_serial::beginPort(const std::string serial_name, uint32_t baudrate){
  */
 void UAS_serial::flushIO(){
   tcflush(_serial_id, TCIOFLUSH);
+}
+
+/**
+ * @brief get available bytes on input buffer
+ * @return -- avaiable bytes on input buffer
+ */
+int UAS_serial::getIncomingBytes(){
+  int rx_bytes = 0;
+  ioctl(_serial_id, TIOCINQ, &rx_bytes);
+  return rx_bytes;
+}
+
+/**
+ * @brief get available bytes on output buffer
+ * @return -- avaiable bytes on input buffer
+ */
+int UAS_serial::getOutgoingBytes(){
+  int tx_bytes = 0;
+  ioctl(_serial_id, TIOCOUTQ, &tx_bytes);
+  return tx_bytes;
 }
 
 /**
