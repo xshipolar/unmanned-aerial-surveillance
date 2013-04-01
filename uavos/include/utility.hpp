@@ -11,7 +11,8 @@
 #include <sys/time.h>
 #include <ctime>
 
-extern unsigned long program_start_time;
+extern unsigned long program_start_time_ms;
+extern unsigned long program_start_time_us;
 
 unsigned long getMicroSeconds();
 

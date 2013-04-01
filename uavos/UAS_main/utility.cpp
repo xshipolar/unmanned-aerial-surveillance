@@ -7,7 +7,8 @@
 
 #include <utility.hpp>
 
-unsigned long program_start_time; // reference time in u_sec for system
+unsigned long program_start_time_us; // reference time in u_sec for system
+unsigned long program_start_time_ms; // reference time in millisec for system
 
 /**
  * @brief -- get current time in microSecond
@@ -17,7 +18,7 @@ unsigned long getMicroSeconds()
 {
     timeval currentTime;
     gettimeofday(&currentTime, NULL);
-    unsigned long usec = currentTime.tv_sec * 1000000 + currentTime.tv_usec - program_start_time;;
+    unsigned long usec = currentTime.tv_sec * 1000000 + currentTime.tv_usec - program_start_time_us;
     return usec;
 }
 
@@ -29,6 +30,6 @@ unsigned long getMilliSeconds()
 {
     timeval currentTime;
     gettimeofday(&currentTime, NULL);
-    unsigned long usec = currentTime.tv_sec * 1000 + currentTime.tv_usec/1000 - program_start_time/1000;
+    unsigned long usec = currentTime.tv_sec * 1000 + currentTime.tv_usec/1000 - program_start_time_ms;
     return usec;
 }

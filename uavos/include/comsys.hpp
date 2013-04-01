@@ -13,6 +13,7 @@
 #include <mavlink/mavlink_types.h>
 #include <datasys.hpp>
 #include <utility.hpp>
+#include <unistd.h>
 
 extern UAS_comm comModule;
 

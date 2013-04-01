@@ -61,8 +61,8 @@ void *runApmLink(void*){
     for(;;){
         if (comModule.isApmOpen()) {
             comModule.updateApm();
-            last_time_apm_link = getMilliSeconds();
         }
+        usleep(10000);
     }
 }
 
@@ -88,8 +88,8 @@ void *runGcsLink(void*){
     for(;;){
         if (comModule.isGcsOpen()) {
             comModule.updateGcs();
-            last_time_gcs_link = getMilliSeconds();
         }
+        usleep(10000);
     }
 }
 

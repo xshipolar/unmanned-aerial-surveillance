@@ -129,7 +129,8 @@ void UAS_comm::updateApm(){
     mavlink_status_t status;
     unsigned char c;
 
-    while(_comm_apm->fetch(&c)>0){
+    while(_comm_apm->getIncomingBytes()>0){
+        _comm_apm->fetch(&c);
         if (mavlink_parse_char(chan_apm, c, &msg, &status)){
             //printf("APM: message received: %d\n",msg.msgid );
             parseApmMessage(&msg);
@@ -148,7 +149,8 @@ void UAS_comm::updateGcs(){
     mavlink_status_t status;
     unsigned char c;
 
-    while(_comm_gcs->fetch(&c)>0){
+    while(_comm_gcs->getIncomingBytes()>0){
+        _comm_gcs->fetch(&c);
         if (mavlink_parse_char(chan_gcs, c, &msg, &status)){
             //printf("GCS: message received: %d\n",msg.msgid );
             parseGcsMessage(&msg);
