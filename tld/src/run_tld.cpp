@@ -150,7 +150,7 @@ GETBOUNDINGBOX:
     drawBox(frame,box);
 	imshow("TLD", frame);
 	
-    if (cvWaitKey(33) == 'q')
+    if ((char)cvWaitKey(33) == 'q')
 	    return 0;
   }
   if (min(box.width,box.height)<(int)fs.getFirstTopLevelNode()["min_win"]){
@@ -200,14 +200,14 @@ REPEAT:
 		lot=0;
 	}
 	//Display
-    //imshow("TLD", frame);
+    imshow("TLD", frame);
     //swap points and images
     swap(last_gray,current_gray);
     pts1.clear();
     pts2.clear();
     frames++;
     //printf("Detection rate: %d/%d\n",detections,frames);
-    if (cvWaitKey(33) == 'q')
+    if ((char)cvWaitKey(33) == 'q')
       break;
   }
   if (rep){
