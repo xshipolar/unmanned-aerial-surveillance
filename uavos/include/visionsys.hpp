@@ -8,10 +8,15 @@
 #ifndef VISIONSYS_HPP_
 #define VISIONSYS_HPP_
 
-#include <UAS_tld.h>
 #include <datasys.hpp>
 #include <cstdio>
 #include <utility.hpp>
+
+// New opentld class
+#include "Main.h"
+#include "Config.h"
+#include "ImAcq.h"
+#include "Gui.h"
 
 struct centroid
 {
@@ -19,14 +24,10 @@ struct centroid
     int y;
  };
 
-extern bool tracking_started;
-
-void initVisionsys();
+void initVisionsys(int argc, char **argv);
 
 void* runVisionsys(void*);
 
 centroid find_centroid();
-
-void mouseHandler(int event, int x, int y, int flags, void *param);
 
 #endif /* VISIONSYS_HPP_ */

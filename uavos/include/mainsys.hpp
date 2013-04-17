@@ -17,7 +17,7 @@
 #include <navsys.hpp>
 
 
-void initialize();
+void initialize(int argc, char **argv);
 
 
 #endif /* MAINSYS_HPP_ */

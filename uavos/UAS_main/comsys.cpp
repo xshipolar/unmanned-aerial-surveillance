@@ -62,7 +62,7 @@ void *runApmLink(void*){
         if (comModule.isApmOpen()) {
             comModule.updateApm();
         }
-        usleep(10000);
+        usleep(10000); // Halt for 10 ms if no bytes incoming
     }
 }
 
@@ -89,7 +89,7 @@ void *runGcsLink(void*){
         if (comModule.isGcsOpen()) {
             comModule.updateGcs();
         }
-        usleep(10000);
+        usleep(10000); // Halt for 10 ms if no bytes incoming
     }
 }
 

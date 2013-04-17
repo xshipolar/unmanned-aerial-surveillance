@@ -34,7 +34,7 @@ void updateAttitude(float roll, float pitch, float yaw, float rollspeed, float p
 }
 
 void updateCurrentGimbalState(double input_pan_angle, double input_tilt_angle, double input_roll_angle){
-    g_current_gimbal_state.pan_angle  = input_pan_angle;
-    g_current_gimbal_state.tilt_angle = input_tilt_angle;
-    g_current_gimbal_state.roll_angle = input_roll_angle;
+    g_current_gimbal_state.pan_angle_deg  = input_pan_angle;
+    g_current_gimbal_state.tilt_angle_deg = input_tilt_angle;
+    g_current_gimbal_state.roll_angle_deg = input_roll_angle;
 }

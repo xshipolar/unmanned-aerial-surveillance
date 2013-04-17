@@ -47,15 +47,15 @@ enum UAS_system_state_t {
 
 struct system_status_t {
     uint8_t navigation_mode;   // mode of the uav operating system
-    uint8_t system_state;  // stage of the current system during operation, e.g initialization, mainloop, etc.
+    uint8_t system_state;      // stage of the current system during operation, e.g initialization, mainloop, etc.
 };
 
 
 struct gimbal_state_t {
     /* data: Euler angles for Gimbal obtained from */
-    double tilt_angle;            //Gimbal Tilt angle in degrees
-    double pan_angle;             //Gimbal Pan  angle in degrees
-    double roll_angle;            //Gimbal Roll angle in degrees
+    double tilt_angle_deg;            //Gimbal Tilt angle in degrees
+    double pan_angle_deg;             //Gimbal Pan  angle in degrees
+    double roll_angle_deg;            //Gimbal Roll angle in degrees
 };
 
 // Prototypes and globals
