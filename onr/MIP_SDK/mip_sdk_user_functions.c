@@ -117,10 +117,10 @@ int mapBaudRate(uint32_t baudrate, int* baudrate_termios){
     return 0; // no error
 }
 
-u16 mip_sdk_port_open(void **port_handle, int port_num, int baudrate) {
+u16 mip_sdk_port_open(void **port_handle, const char *port_name, int baudrate) {
     // Get device name
-    char port_name[15];
-    sprintf(port_name,"/dev/ttyACM%d",port_num);
+    // char port_name[15];
+    // sprintf(port_name,"/dev/ttyACM%d",port_name);
 
     // Begin port with device name and baudrate 
     int baudr;

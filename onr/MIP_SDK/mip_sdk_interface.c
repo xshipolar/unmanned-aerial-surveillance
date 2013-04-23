@@ -47,7 +47,7 @@
 //
 //! @section DETAILS
 //!
-//! @param [in] u32 com_port                    - The port to interface to.
+//! @param [in] u8* com_port                    - The port to interface to.
 //! @param [in] u32 baudrate                    - The baudrate of the port.
 //! @param [in] mip_interface *device_interface - The device interface.
 //! @param [in] u32 packet_timeout_val          - Timeout for the incoming packet in milliseconds.
@@ -62,7 +62,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 
-u16 mip_interface_init(u32 com_port, u32 baudrate, mip_interface *device_interface, u32 packet_timeout_val)
+u16 mip_interface_init(const char *com_port, u32 baudrate, mip_interface *device_interface, u32 packet_timeout_val)
 {
  u16 i;
   

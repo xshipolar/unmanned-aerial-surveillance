@@ -7,9 +7,7 @@
  */
  
 #include "UAS_serial.hpp"
-#include <string>
-#include <cstdio>
-#include <cstring>
+
 /**
  * @brief -- default constructor of UAS_serial class
  */

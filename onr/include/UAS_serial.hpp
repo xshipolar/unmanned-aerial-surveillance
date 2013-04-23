@@ -13,6 +13,10 @@
 #include <inttypes.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <string>
+#include <cstdio>
+#include <cstring>
+#include <sys/ioctl.h>
 
 class UAS_serial {
 public:
