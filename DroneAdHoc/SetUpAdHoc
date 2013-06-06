@@ -1,0 +1,72 @@
+#!/bin/bash
+#Script to create/join an ad-hoc network
+#By Simon Peter
+
+echo "Do you want to (1)create/connect to a network or (2)scan the network for devices?"
+read option
+while [[ "$option" -ne 1 && "$option" -ne 2 ]]
+do
+        echo "That was not a valid option"
+        echo "Do you want to (1)create/connect to a network or (2)scan the network for devices?"
+        read option
+done
+
+if [ "$option" -eq 1 ]
+then
+	clear
+	echo "Note down the interface(ex:wlan0,eth2) that displays wireless information, then press ENTER"
+	iwconfig | grep 'IEE'
+	read enter
+	echo ""
+	echo "These are the networks found, note the SSID you want to connect to. Then press ENTER"
+	iwlist scan | grep 'ESSID'
+	read enter
+	clear
+	echo "Enter the interface name of your wireless card"
+	echo -n  ">> " 
+	read interface
+	echo  "Enter an SSID"
+	echo -n  ">> "
+	read ssid
+	echo "Pick a unique number for the device you are connecting with ranging from 1-254"
+	echo -n  ">> "
+	read id
+
+	echo "Are you using (1)Arch or (2)Ubuntu?"
+	echo -n ">> "
+	read linux
+	if [ "$linux" -eq 1 ]
+	then
+		sudo systemctl stop NetworkManager
+	else
+		sudo service network-manager stop
+	fi
+	#echo "Is network-manager present? y/n? "
+	#echo -n  ">> "
+	#read manager
+	#if [ manager = "y" ] ; then 
+	#	sudo service network-manager stop
+	#	echo "Stopping network-manager"
+	#fi
+
+	sudo ifconfig $interface down
+	sudo iwconfig $interface mode ad-hoc channel 1 essid $ssid key off
+	sudo ifconfig $interface 192.168.1.$id
+	echo ""
+	echo "Network up."
+	echo "To test connection, ping the control computer at it's IP address and check for a response."
+	echo "To connect via ssh, connect to \"username@localhost\" where localhost is the IP address of the remote machine."
+	echo "Your IP address is 192.168.1.$id"
+	echo "The following IP addresses were found on your network:"
+	for ip in 192.168.1.{1..254}; do
+	  ping -c 1 -W 1 $ip | grep "64 bytes" &
+	done
+else
+	echo "The following networks were found:"
+	iwlist scan | grep 'ESSID:'
+	echo ""
+	echo "The following IP addresses were found on your network:"
+	for ip in 192.168.1.{1..254}; do
+	  ping -c 1 -W 1 $ip | grep "64 bytes" &
+	done
+fi

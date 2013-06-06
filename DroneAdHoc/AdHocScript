@@ -1,0 +1,25 @@
+#!/bin/bash
+#Establish an AdHoc network
+
+
+#Set the wireless interface name (Enter "iwconfig" and look for the interface that DOESN'T say "no wireless extensions")
+INTERFACE=wlan0
+
+#Set the desired name for your network/device
+SSID=Latitude
+
+#By default, the wireless channel is set to 1
+CHANNEL=1
+
+#By default, the last digit of the IP address is set to 1
+IP=1
+
+#If on Ubuntu and Network Manager is enabled, uncomment the following command
+#sudo service network-manager stop
+
+#If on Arch and Network Manager is enabled, uncomment the following command
+#sudo systemctl stop NetworkManager.service
+
+sudo ifconfig $INTERFACE down
+sudo iwconfig $INTERFACE mode ad-hoc channel $CHANNEL essid $SSID key off
+sudo ifconfig $INTERFACE 192.168.1.$IP

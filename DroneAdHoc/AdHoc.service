@@ -1,0 +1,9 @@
+[Unit]
+Description=SetUpAdHoc script
+
+[Service]
+ExecStart=/usr/bin/AdHocScript
+
+[Install]
+WantedBy=multi-user.target
+
